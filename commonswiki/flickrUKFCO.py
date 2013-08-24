@@ -86,14 +86,15 @@ class FlickrUploadBot(object):
             except:
                 fileDate = ""
         fileURL = re.findall('<script>.*?var photo = \{.*?baseURL: (.*?),.*?\}.*?</script>', pageText, re.S)[0][1:-1]
-        name = "%s (%s)" % (fileTitle, photoID)
+        extension = fileURL.split(".")[-1]
+        name = "%s (%s).%s" % (fileTitle, photoID, extension)
         path = os.path.abspath(
             os.path.join(
                 "flickrUKFCO",
                 name
             )
         )
-        urllib.urlretrieve(pageURL, path)
+        urllib.urlretrieve(fileURL, path)
         imagePage = pywikibot.ImagePage(site, name)
         imagePage.text = self.imageDescription % {
             description: fileDescription,
