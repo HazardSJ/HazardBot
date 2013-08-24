@@ -68,21 +68,21 @@ class FlickrUploadBot(object):
             re.findall('<meta name="description" content="(.*?)">', pageText, re.S)[0]
         ).get_text()
         try:
-            dateParse = dateparser.parse(fileDescription)  #, fuzzy=True)
-            fileDate = "%s-%s-%s" % (
-                dateParse.year,
-                dateParse.month if dateParse.month > 9 else "0%s" % dateParse.month,
-                dateParse.day if dateParse.day > 9 else "0%s" % dateParse.day
-            )
+            fileDate = re.findall(
+                'Taken on <a href="/photos/foreignoffice/archives/date-taken/(.*?)/" title="Uploaded .*? " class="ywa-track" data-ywa-name="Date, Taken on">.*?</a>',
+                pageText,
+                re.S
+            )[0].replace("/", "-")
         except:
             fileDate = ""
         if not fileDate:
             try:
-                fileDate = re.findall(
-                    'Taken on <a href="/photos/foreignoffice/archives/date-taken/(.*?)/" title="Uploaded .*? " class="ywa-track" data-ywa-name="Date, Taken on">.*?</a>',
-                    pageText,
-                    re.S
-                )[0].replace("/", "-")
+                dateParse = dateparser.parse(fileDescription)  #, fuzzy=True)
+                fileDate = "%s-%s-%s" % (
+                    dateParse.year,
+                    dateParse.month if dateParse.month > 9 else "0%s" % dateParse.month,
+                    dateParse.day if dateParse.day > 9 else "0%s" % dateParse.day
+                )
             except:
                 fileDate = ""
         fileURL = re.findall('<script>.*?var photo = \{.*?baseURL: (.*?),.*?\}.*?</script>', pageText, re.S)[0][1:-1]
