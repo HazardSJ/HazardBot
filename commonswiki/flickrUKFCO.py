@@ -24,6 +24,7 @@ site.login()
 
 class FlickrUploadBot(object):
     def __init__(self):
+        self.subDirName = "flickrUKFCO"  # determines the sub-directory it uses
         self.baseURL = "https://secure.flickr.com/photos/foreignoffice/"
         self.imageDescription = """\
 == {{int:filedesc}} ==
@@ -56,7 +57,10 @@ class FlickrUploadBot(object):
                 re.DOTALL
             )
             for photoID in photoIDs:
-                self.parsePhoto(photoID.group(1))
+                try:
+                    self.parsePhoto(photoID.group(1))
+                except:
+                    continue
 
     def parsePhoto(self, photoID):
         pageURL = self.baseURL + photoID  # + "/in/photostream/"
@@ -90,22 +94,28 @@ class FlickrUploadBot(object):
         name = "%s (%s).%s" % (fileTitle, photoID, extension)
         path = os.path.abspath(
             os.path.join(
-                "flickrUKFCO",
+                self.subDirName,
                 name
             )
         )
         urllib.urlretrieve(fileURL, path)
         imagePage = pywikibot.ImagePage(site, name)
         imagePage.text = self.imageDescription % {
-            description: fileDescription,
-            date: fileDate,
-            source: pageURL
+            "description": fileDescription,
+            "date": fileDate,
+            "source": pageURL
         }
         site.upload(imagePage, source_filename=path)
         os.remove(path)
 
+    def ensureSubDir(self):
+        directory = os.path.abspath(self.subDirName)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
     def run(self):
-        return self.parsePages()
+        self.ensureSubDir()
+        self.parsePages()
 
 def main():
     bot = FlickrUploadBot()
