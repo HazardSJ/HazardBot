@@ -13,6 +13,7 @@ import urllib2
 
 import pywikibot
 from bs4 import BeautifulSoup
+import dateutil.parser as dateparser  # http://labix.org/python-dateutil
 
 
 pywikibot.config.family = "commons"
@@ -46,8 +47,7 @@ class FlickrUploadBot(object):
         for pageNumber in range(1, 40):
             pageURL = self.baseURL + "page" + str(pageNumber) + "/"
             pageText = ""
-            print pageURL
-            #pageURL = urllib2.Request(pageURL, headers={"User-Agent": "Python Wikimedia Commons Uploader"})  ##
+            # pageURL = urllib2.Request(pageURL, headers={"User-Agent": "Python Wikimedia Commons Uploader"})  ##
             for line in urllib2.urlopen(pageURL):
                 pageText += line
             photoIDs = re.finditer(
@@ -67,16 +67,24 @@ class FlickrUploadBot(object):
         fileDescription = BeautifulSoup(
             re.findall('<meta name="description" content="(.*?)">', pageText, re.S)[0]
         ).get_text()
-        print re.findall(
-            'Taken on <a href="/photos/foreignoffice/archives/date-taken/(.*?)/" title=',  #"Uploaded .*? " class="ywa-track" data-ywa-name="Date, Taken on">.*?</a>',
-            pageText,
-            re.S
-        )
-        fileDate = re.findall(
-            'Taken on <a href="/photos/foreignoffice/archives/date-taken/(.*?)/" title="Uploaded .*? " class="ywa-track" data-ywa-name="Date, Taken on">.*?</a>',
-            pageText,
-            re.S
-        )[0].replace("/", "-")
+        try:
+            dateParse = dateparser.parse(fileDescription)  #, fuzzy=True)
+            fileDate = "%s-%s-%s" % (
+                dateParse.year,
+                dateParse.month if dateParse.month > 9 else "0%s" % dateParse.month,
+                dateParse.day if dateParse.day > 9 else "0%s" % dateParse.day
+            )
+        except:
+            fileDate = ""
+        if not fileDate:
+            try:
+                fileDate = re.findall(
+                    'Taken on <a href="/photos/foreignoffice/archives/date-taken/(.*?)/" title="Uploaded .*? " class="ywa-track" data-ywa-name="Date, Taken on">.*?</a>',
+                    pageText,
+                    re.S
+                )[0].replace("/", "-")
+            except:
+                fileDate = ""
         fileURL = re.findall('<script>.*?var photo = \{.*?baseURL: (.*?),.*?\}.*?</script>', pageText, re.S)[0][1:-1]
         name = "%s (%s)" % (fileTitle, photoID)
         path = os.path.abspath(
