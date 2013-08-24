@@ -77,7 +77,7 @@ class FlickrUploadBot(object):
             fileDate = ""
         if not fileDate:
             try:
-                dateParse = dateparser.parse(fileDescription)  #, fuzzy=True)
+                dateParse = dateparser.parse(fileDescription)
                 fileDate = "%s-%s-%s" % (
                     dateParse.year,
                     dateParse.month if dateParse.month > 9 else "0%s" % dateParse.month,
