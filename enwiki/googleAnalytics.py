@@ -10,17 +10,17 @@ import MySQLdb
 import pywikibot
 
 
-pywikibot.config.family = 'wikipedia'
-pywikibot.config.mylang = 'en'
+pywikibot.config.family = "wikipedia"
+pywikibot.config.mylang = "en"
 
 site = pywikibot.Site()
 site.login()
 page = pywikibot.Page(site, "User:Hazard-Bot/Google Analytics report")
 
 connection = MySQLdb.connect(
-    host = 'enwiki.labsdb',
-    db = 'enwiki_p',
-    read_default_file = '~/replica.my.cnf'
+    host = "enwiki.labsdb",
+    db = "enwiki_p",
+    read_default_file = "~/replica.my.cnf"
 )
 cursor = connection.cursor()
 query = '''\
@@ -46,4 +46,4 @@ pywikibot.data.api.Request(
     summary="Robot: generated list of pages with links tracked by Google Analytics",
     bot=1
 ).submit()
-#page.put(text, comment="Robot: generated list of pages with links tracked by Google Analytics")
+# page.put(text, comment="Robot: generated list of pages with links tracked by Google Analytics")
