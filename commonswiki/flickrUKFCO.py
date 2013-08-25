@@ -6,14 +6,13 @@
 # https://creativecommons.org/licenses/by-sa/3.0/
 
 
+import json
 import os
 import re
 import urllib
 import urllib2
 
 import pywikibot
-from bs4 import BeautifulSoup
-import dateutil.parser as dateparser  # http://labix.org/python-dateutil
 
 
 pywikibot.config.family = "commons"
@@ -32,7 +31,7 @@ class FlickrUploadBot(object):
 |description={{en|1=%(description)s}}
 |date=%(date)s
 |source=%(source)s
-|author=Foreign and Commonwealth Office
+|author=%(owner)s
 |permission=
 |other_versions=
 |other_fields=
@@ -48,7 +47,6 @@ class FlickrUploadBot(object):
         for pageNumber in range(1, 40):
             pageURL = self.baseURL + "page" + str(pageNumber) + "/"
             pageText = ""
-            # pageURL = urllib2.Request(pageURL, headers={"User-Agent": "Python Wikimedia Commons Uploader"})  ##
             for line in urllib2.urlopen(pageURL):
                 pageText += line
             photoIDs = re.finditer(
@@ -63,35 +61,20 @@ class FlickrUploadBot(object):
                     continue
 
     def parsePhoto(self, photoID):
-        pageURL = self.baseURL + photoID  # + "/in/photostream/"
+        pageURL = self.baseURL + photoID
         pageText = ""
         for line in urllib2.urlopen(pageURL):
             pageText += line
-        fileTitle = re.findall('<meta name="title" content="(.*?)">', pageText, re.S)[0]
-        fileDescription = BeautifulSoup(
-            re.findall('<meta name="description" content="(.*?)">', pageText, re.S)[0]
-        ).get_text()
-        try:
-            fileDate = re.findall(
-                'Taken on <a href="/photos/foreignoffice/archives/date-taken/(.*?)/" title="Uploaded .*? " class="ywa-track" data-ywa-name="Date, Taken on">.*?</a>',
-                pageText,
-                re.S
-            )[0].replace("/", "-")
-        except:
-            fileDate = ""
-        if not fileDate:
-            try:
-                dateParse = dateparser.parse(fileDescription)
-                fileDate = "%s-%s-%s" % (
-                    dateParse.year,
-                    dateParse.month if dateParse.month > 9 else "0%s" % dateParse.month,
-                    dateParse.day if dateParse.day > 9 else "0%s" % dateParse.day
-                )
-            except:
-                fileDate = ""
-        fileURL = re.findall('<script>.*?var photo = \{.*?baseURL: (.*?),.*?\}.*?</script>', pageText, re.S)[0][1:-1]
-        extension = fileURL.split(".")[-1]
-        name = "%s (%s).%s" % (fileTitle, photoID, extension)
+        fileData = json.loads(
+            re.findall("Y\.photo\.init\((.*?)\);", pageText, re.S)[0]
+        )
+        fileTitle = fileData["title"]
+        fileDescription = fileData["description"]
+        fileDate = fileData["date_taken"]
+        fileOwner = fileData["ownername"]
+        fileURL = fileData["sizes"]["o"]["url"]
+        fileExtension = fileURL.split(".")[-1]
+        name = "%s (%s).%s" % (fileTitle, photoID, fileExtension)
         path = os.path.abspath(
             os.path.join(
                 self.subDirName,
@@ -101,8 +84,9 @@ class FlickrUploadBot(object):
         urllib.urlretrieve(fileURL, path)
         imagePage = pywikibot.ImagePage(site, name)
         imagePage.text = self.imageDescription % {
-            "description": fileDescription,
             "date": fileDate,
+            "description": fileDescription,
+            "owner": fileOwner,
             "source": pageURL
         }
         site.upload(imagePage, source_filename=path)
