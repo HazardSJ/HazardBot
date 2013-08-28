@@ -31,7 +31,7 @@ class FlickrUploadBot(object):
 |description={{en|1=%(description)s}}
 |date=%(date)s
 |source=%(source)s
-|author=%(owner)s
+|author={{en|1=%(owner)s}}
 |permission=
 |other_versions=
 |other_fields=
