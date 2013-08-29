@@ -12,6 +12,7 @@ import pywikibot
 pywikibot.config.family = "wikipedia"
 pywikibot.config.mylang = "en"
 site = pywikibot.Site()
+site.login()
 
 templates = [
     pywikibot.Page(site, "Template:Infobox language"),
