@@ -58,6 +58,8 @@ class FlickrUploadBot(object):
             for photoID in photoIDs:
                 try:
                     self.parsePhoto(photoID.group(1))
+                except KeyboardInterrupt:
+                    raise pywikibot.Error("Keyboard interrupted")
                 except:
                     continue
 
