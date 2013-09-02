@@ -22,7 +22,8 @@ site = pywikibot.Site()
 site.login()
 
 class FlickrUploadBot(object):
-    def __init__(self):
+    def __init__(self, requester=None):
+        self.requester = requester
         self.subDirName = "flickrUKFCO"  # determines the sub-directory it uses
         self.baseURL = "https://secure.flickr.com/photos/foreignoffice/"
         self.imageDescription = """\
@@ -89,7 +90,7 @@ class FlickrUploadBot(object):
             "owner": fileOwner,
             "source": pageURL
         }
-        site.upload(imagePage, source_filename=path)
+        site.upload(imagePage, source_filename=path, comment=self.summary)
         os.remove(path)
 
     def ensureSubDir(self):
@@ -98,11 +99,17 @@ class FlickrUploadBot(object):
             os.makedirs(directory)
 
     def run(self):
+        if not self.requester:
+            raise pywikibot.Error("No requester is set")
+        else:
+            self.summary = "[[Commons:Bots|Bot]]: Uploading files from Flickr per request by [[User:%s|%s]]" \
+                % (self.requester, self.requester)
         self.ensureSubDir()
         self.parsePages()
 
 def main():
-    bot = FlickrUploadBot()
+    requester = "Russavia"
+    bot = FlickrUploadBot(requester = requester)
     bot.run()
 
 if __name__ == "__main__":
