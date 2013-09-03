@@ -25,6 +25,7 @@ class FlickrUploadBot(object):
     def __init__(self, requester=None):
         self.requester = requester
         self.subDirName = "flickrUKFCO"  # determines the sub-directory it uses
+        self.uploadByURL = "upload_by_url" in site.getuserinfo()["rights"]
         self.baseURL = "https://secure.flickr.com/photos/foreignoffice/"
         self.imageDescription = """\
 == {{int:filedesc}} ==
@@ -78,13 +79,6 @@ class FlickrUploadBot(object):
         fileURL = fileData["sizes"]["o"]["url"]
         fileExtension = fileURL.split(".")[-1]
         name = "%s (%s).%s" % (fileTitle, photoID, fileExtension)
-        path = os.path.abspath(
-            os.path.join(
-                self.subDirName,
-                name
-            )
-        )
-        urllib.urlretrieve(fileURL, path)
         imagePage = pywikibot.ImagePage(site, name)
         imagePage.text = self.imageDescription % {
             "date": fileDate,
@@ -92,8 +86,18 @@ class FlickrUploadBot(object):
             "owner": fileOwner,
             "source": pageURL
         }
-        site.upload(imagePage, source_filename=path, comment=self.summary)
-        os.remove(path)
+        if self.uploadByURL:
+            site.upload(imagePage, source_url=fileURL, comment=self.summary)
+        else:
+            path = os.path.abspath(
+                os.path.join(
+                    self.subDirName,
+                    name
+                )
+            )
+            urllib.urlretrieve(fileURL, path)
+            site.upload(imagePage, source_filename=path, comment=self.summary)
+            os.remove(path)
 
     def ensureSubDir(self):
         directory = os.path.abspath(self.subDirName)
@@ -106,7 +110,8 @@ class FlickrUploadBot(object):
         else:
             self.summary = "[[Commons:Bots|Bot]]: Uploading files from Flickr per request by [[User:%s|%s]]" \
                 % (self.requester, self.requester)
-        self.ensureSubDir()
+        if not self.uploadByURL:
+            self.ensureSubDir()
         self.parsePages()
 
 def main():
