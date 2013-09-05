@@ -40,7 +40,7 @@ class CurrentEventsBot(object):
         page = pywikibot.Page(site, self.prefix + tomorrow)
         if page.exists():
             return
-        page.put(self.text % self.date, "[[Wikipedia:Bots|Bot]]: Creating tomorrow's current events page")
+        page.put(self.text % self.date, "[[Wikipedia:Bots|Bot]]: Created tomorrow's current events page")
 
 
 def main():
