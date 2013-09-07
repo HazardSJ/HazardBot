@@ -18,7 +18,7 @@ pywikibot.config.mylang = "commons"
 site = pywikibot.Site()
 site.login()
 
-class LocalizationBot(object):
+class InternationalizationBot(object):
     def __init__(self):
         self.dumpFile = "/public/datasets/public/commonswiki/20130817/commonswiki-20130817-pages-articles.xml.bz2"
         self.loadFileTranslations()
@@ -135,7 +135,7 @@ class LocalizationBot(object):
 
 
 def main():
-    bot = LocalizationBot()
+    bot = InternationalizationBot()
     bot.run()
 
 if __name__ == "__main__":
