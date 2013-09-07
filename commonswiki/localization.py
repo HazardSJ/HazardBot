@@ -125,8 +125,7 @@ class LocalizationBot(object):
             text = page.get()
             if self.makeFixes(text):
                 pywikibot.showDiff(text, unicode(self.code))
-                raw_input("")  # For dry run so I can review each simulated edit's diff
-                # page.put(unicode(self.code), comment="[[Commons:Bots|Bot]]: Applied localization fixes")  # Commented for dry run
+                page.put(unicode(self.code), comment="[[Commons:Bots|Bot]]: Applied localization fixes")
 
 
 def main():
