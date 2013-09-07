@@ -122,10 +122,16 @@ class LocalizationBot(object):
                 print page.title()
             except UnicodeDecodeError:
                 print "(page_title)"
-            text = page.get()
+            try:
+                text = page.get()
+            except (Exception, pywikibot.Error), error:
+                print "\nError: %s\n" % error
             if self.makeFixes(text):
                 pywikibot.showDiff(text, unicode(self.code))
-                page.put(unicode(self.code), comment="[[Commons:Bots|Bot]]: Applied localization fixes")
+                try:
+                    page.put(unicode(self.code), comment="[[Commons:Bots|Bot]]: Applied localization fixes")
+                except (Exception, pywikibot.Error), error:
+                    print "\nError: %s\n" % error
 
 
 def main():
