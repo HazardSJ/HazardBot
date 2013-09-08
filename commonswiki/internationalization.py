@@ -129,7 +129,7 @@ class InternationalizationBot(object):
             if self.makeFixes(text):
                 pywikibot.showDiff(text, unicode(self.code))
                 try:
-                    page.put(unicode(self.code), comment="[[Commons:Bots|Bot]]: Applied localization fixes")
+                    page.put(unicode(self.code), comment="[[Commons:Bots|Bot]]: Applied fixes for internationalization support")
                 except (Exception, pywikibot.Error), error:
                     print "\nError: %s\n" % error
 
