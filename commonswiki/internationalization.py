@@ -49,9 +49,9 @@ class InternationalizationBot(object):
                 if namespace.lower().strip() in ["file", "image"]:
                     continue
                 elif namespace.lower().strip() in self.fileTranslations:
-                    namespace.replace(namespace.strip(), "File")
+                    namespace = namespace.replace(namespace.strip(), "File")
                     newLine = ":".join([namespace, other])
-                    text.replace(gallery, gallery.replace(line, newLine))
+                    text = text.replace(gallery, gallery.replace(line, newLine))
         self.code = mwparserfromhell.parse(text)
 
     def fixHeadings(self):
