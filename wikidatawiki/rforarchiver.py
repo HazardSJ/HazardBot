@@ -19,7 +19,7 @@ site = pywikibot.Site()
 site.login()
 
 
-class RfpOtherArchiverBot(object):
+class RforArchiverBot(object):
     def __init__(self):
         self.basePage = pywikibot.Page(site, "Wikidata:Requests for permissions")
         self.requestsPage = pywikibot.Page(site, self.basePage.title() + "/Other rights")
@@ -92,7 +92,7 @@ class RfpOtherArchiverBot(object):
 
 
 def main():
-    bot = RfpOtherArchiverBot()
+    bot = RforArchiverBot()
     bot.run()
 
 if __name__ == "__main__":
