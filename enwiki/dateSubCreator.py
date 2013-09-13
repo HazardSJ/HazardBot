@@ -169,6 +169,8 @@ class SubCreatorBot(object):
             try:
                 self.page = pywikibot.Page(site, self.subs[sub]["title"] % self.date)
                 if isinstance(self.subs[sub]["text"], list):
+                    if self.page.exists():
+                        continue
                     revid = self.submit(self.subs[sub]["text"][0] % self.date, revid=True)
                     self.submit(
                         self.subs[sub]["text"][1] % dict(self.date.items() + [("revid", revid)]),
