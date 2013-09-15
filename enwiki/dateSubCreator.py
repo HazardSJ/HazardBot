@@ -19,15 +19,15 @@ class SubCreatorBot(object):
     def __init__(self):
         self.getDate()
         self.subs = {
-            "currentevents": {
-                "title": "Portal:Current events/%(year)s %(monthname)s %(day)s",
-                "text": """\
-{{Current events header|%(year)s|%(month2)s|%(day)s}}
-<!-- All news items below this line -->
-* 
-<!-- All news items above this line -->|}
-"""
-            },
+#            "currentevents": {
+#                "title": "Portal:Current events/%(year)s %(monthname)s %(day)s",
+#                "text": """\
+#{{Current events header|%(year)s|%(month2)s|%(day)s}}
+#<!-- All news items below this line -->
+#* 
+#<!-- All news items above this line -->|}
+#"""
+#            },
             "differentname": {
                 "title":
                     "Category:Wikipedia files with a different name on Wikimedia Commons as of %(day)s %(monthname)s %(year)s",
