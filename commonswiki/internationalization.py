@@ -120,7 +120,7 @@ class InternationalizationBot(object):
             page = pywikibot.Page(site, title)
             try:
                 print page.title()
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, UnicodeEncodeError):
                 print "(page_title)"
             try:
                 text = page.get()
