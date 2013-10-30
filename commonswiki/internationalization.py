@@ -105,7 +105,6 @@ class InternationalizationBot(object):
             return True
 
     def generator(self):
-        self.dumpFile
         dump = xmlreader.XmlDump(self.dumpFile)
         gen = dump.parse()
         for page in gen:
@@ -126,6 +125,7 @@ class InternationalizationBot(object):
                 text = page.get()
             except (Exception, pywikibot.Error), error:
                 print "\nError: %s\n" % error
+                continue
             if self.makeFixes(text):
                 pywikibot.showDiff(text, unicode(self.code))
                 try:
