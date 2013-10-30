@@ -72,13 +72,24 @@ class InternationalizationBot(object):
             if template.name.lower().strip() == "information":
                 for param in template.params:
                     if param.name.lower().strip() == "source":
-                        if "own work" == param.value:
+                        if param.value.lower().strip() == "own work":
                             param.value = unicode(param.value).replace(
                                 param.value.strip(),
                                 "{{own}}"
                             )
+                        elif param.value.lower().strip() == "unknown":
+                            param.value = unicode(param.value).replace(
+                                param.value.strip(),
+                                "{{unknown|1=source}}"
+                            )
+                    elif param.name.lower().strip() == "author":
+                        if param.value.lower().strip() == "unknown":
+                            param.value = unicode(param.value).replace(
+                                param.value.strip(),
+                                "{{unknown|1=author}}"
+                            )
                     elif param.name.lower().strip() == "permission":
-                        if "see below" == param.value:
+                        if param.value.lower().strip() == "see below":
                             param.value = unicode(param.value).replace(
                                 param.value.strip(),
                                 ""
