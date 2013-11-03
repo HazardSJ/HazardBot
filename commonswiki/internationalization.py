@@ -137,6 +137,10 @@ class InternationalizationBot(object):
             except (Exception, pywikibot.Error), error:
                 print "\nError: %s\n" % error
                 continue
+            else:
+                if not page.exists():
+                    print "\nError: The page does not exist.\n" % error
+                    continue
             if self.makeFixes(text):
                 pywikibot.showDiff(text, unicode(self.code))
                 try:
