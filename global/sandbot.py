@@ -101,8 +101,7 @@ class SandBot(object):
                 },
                 "groups": {
                     "tutorial": "{{subst:/origineel}}",
-                    "general": ur"""\
-<!-- Laat deze en de volgende regel a.u.b. altijd staan. -->{{Wikipedia:Zandbak/hoofding}}
+                    "general": ur"""<!-- Laat deze en de volgende regel a.u.b. altijd staan. -->{{Wikipedia:Zandbak/hoofding}}
 
 == Wist je dat... ==
 
