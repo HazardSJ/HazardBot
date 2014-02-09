@@ -30,7 +30,7 @@ class RforArchiverBot(object):
             "propertycreator": self.basePage.title() + "/RfPropertyCreator/%s",
             "rollbacker": self.basePage.title() + "/RfRollback/%s"
         }
-        self.closedRegex = "\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?top\|.*?\}\}.*?"
+        self.closedRegex = "\n\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?top\|.*?\}\}.*?"
         self.closedRegex += "\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?bottom\}\}\n"
         self.archiveText = "{{Archive|category=Archived requests for permissions}}"
         self.archiveText += "\n__TOC__\n{{Discussion top}}\n\n"
