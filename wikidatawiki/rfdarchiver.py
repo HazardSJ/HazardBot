@@ -22,7 +22,7 @@ site.login()
 
 class RFDArchiverBot(object):
     def __init__(self):
-        self.timeDiff = float(1 * (60 * 60))
+        self.timeDiff = float(0.5 * (60 * 60))
         self.currentTime = time.gmtime()
         self.currentTimestamp = time.mktime(self.currentTime)
         rfdTitle = "Wikidata:Requests for deletions"
@@ -37,7 +37,8 @@ class RFDArchiverBot(object):
         sections = self.rfdCode.get_sections(levels=[2])
         for section in sections:
             responded = False
-            templates = [template.name.lower().strip() for template in section.filter_templates()]
+            # templates = [template.name.lower().strip() for template in section.ifilter_templates()]
+            templates = [template.lower() for template in re.findall("\{\{\s*(.*?)\s*[\|\}]", unicode(section), re.S)]
             for responseTemplate in self.responseTemplates:
                 if responseTemplate in templates:
                     responded = True
