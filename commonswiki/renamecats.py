@@ -116,14 +116,16 @@ class RenameCategoryBot(object):
                             " (given reason: '%s')" % reason if reason else ""
                         )
                     )
-            if not (list(self.oldCat.articles()) or list(self.oldCat.subcategories())):
-                self.oldCat.put(
-                    "{{Category redirect|%s}}" % self.newCat.title(withNamespace = False),
-                    comment = "[[Commons:Bots|Bot]]: Redirected renamed category to %s%s" % (
-                        self.newCat.title(asLink = True),
-                        " (given reason: '%s')" % reason if reason else ""
+            if self.oldCat.exists() and not (list(self.oldCat.articles()) or list(self.oldCat.subcategories())):
+                oldCatText = self.oldCat.get().lower()
+                if not (re.search("bad\s?name", oldCatText) or "redir" in oldCatText):
+                    self.oldCat.put(
+                        "{{Category redirect|%s}}" % self.newCat.title(withNamespace = False),
+                        comment = "[[Commons:Bots|Bot]]: Redirected renamed category to %s%s" % (
+                            self.newCat.title(asLink = True),
+                            " (given reason: '%s')" % reason if reason else ""
+                        )
                     )
-                )
 
 def main():
     bot = RenameCategoryBot()
