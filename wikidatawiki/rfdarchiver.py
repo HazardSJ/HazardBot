@@ -37,8 +37,7 @@ class RFDArchiverBot(object):
         sections = self.rfdCode.get_sections(levels=[2])
         for section in sections:
             responded = False
-            # templates = [template.name.lower().strip() for template in section.ifilter_templates()]
-            templates = [template.lower() for template in re.findall("\{\{\s*(.*?)\s*[\|\}]", unicode(section), re.S)]
+            templates = [template.name.lower().strip() for template in section.ifilter_templates()]
             for responseTemplate in self.responseTemplates:
                 if responseTemplate in templates:
                     responded = True
@@ -95,8 +94,8 @@ class RFDArchiverBot(object):
             archiveText = self.archivePage.get()
         else:
             archiveText = self.archiveHeader
-        self.rfdCode = mwparserfromhell.parse(rfdText)
-        self.archiveCode = mwparserfromhell.parse(archiveText + "\n\n")
+        self.rfdCode = mwparserfromhell.parser.Parser().parse(rfdText, skip_style_tags=True)
+        self.archiveCode = mwparserfromhell.parser.Parser().parse(archiveText + "\n\n", skip_style_tags=True)
         self.processRequests()
         if not self.archiveCount:
             print "There are no archivable requests."
