@@ -33,12 +33,12 @@ class RFORArchiverBot(object):
         self.closedRegex = "\n\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?top\|.*?\}\}.*?"
         self.closedRegex += "\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?bottom\}\}\n"
         self.archiveText = "{{Archive|category=Archived requests for permissions}}"
-        self.archiveText += "\n__TOC__\n{{Discussion top}}\n\n"
+        self.archiveText += "\n__TOC__\n{{Discussion top}}"
 
         
     def run(self):
         text = self.requestsPage.get()
-        code = mwparserfromhell.parse(text)
+        code = mwparserfromhell.parser.Parser().parse(text, skip_style_tags=True)
         for section in code.get_sections(levels=[2]):
             if "autopatrol" in section.filter_headings()[0].title.lower():
                 group = "autopatrolled"
@@ -51,37 +51,36 @@ class RFORArchiverBot(object):
             else:
                 continue
             archivable = list()
-            discussions = re.findall(self.closedRegex, unicode(section), re.I|re.S)
-            for discussion in discussions:
+            for discussion in section.get_sections(levels=[3]):
+                templates = [template.name.lower().strip() for template in discussion.ifilter_templates()]
+                if not ("done" in templates or "not done" in templates):
+                    continue
                 timestamps = re.findall(
-                    "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", unicode(section)
+                    "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", unicode(discussion)
                 )
                 timestamps = sorted(
                     [datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y") for timestamp in timestamps]
                 )
-                if (datetime.utcnow() - timestamps[-1]).days > 5:
-                    archivable.append(discussion)
+                if (datetime.utcnow() - timestamps[-1]).days >= 5:
+                    archivable.append(unicode(discussion))
             if not archivable:
                 continue
             for remove in archivable:
-                code = mwparserfromhell.parse(
-                    unicode(code).replace(remove, "")
-                )
+                code.replace(remove, "")
             archive = pywikibot.Page(
                 site,
                 self.archiveTitles[group] % datetime.utcnow().strftime("%B %Y")
             )
             if archive.exists():
-                archiveText = archive.get() + "\n\n"
+                archiveText = archive.get()
             else:
                 archiveText = self.archiveText
+            archiveText += "\n\n"
             archiveCode = mwparserfromhell.parse(archiveText)
             for add in archivable:
-                new = mwparserfromhell.parse(add)
-                new.nodes = new.nodes[1:-2]
-                append = unicode(new).strip() + "\n\n"
-                if not append in archiveCode:
-                    archiveCode.append(append)
+                append = unicode(add).strip()
+                if not append in unicode(archiveCode):
+                    archiveCode.append(append + "\n\n")
             archive.put(
                 unicode(archiveCode),
                 "[[Wikidata:Bots|Bot]]: Archiving from %s" % self.requestsPage.title(asLink=True)
