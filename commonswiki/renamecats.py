@@ -74,7 +74,7 @@ class RenameCategoryBot(object):
         for template in templates:
             if template.name.lower().strip() == "move":
                 catCode.remove(template)
-        self.newCat.put(unicode(catCode), summary)
+        self.newCat.put(unicode(catCode).strip(), summary)
 
     def updateWikidata(self):
         itemOld = pywikibot.ItemPage.fromPage(self.oldCat)
