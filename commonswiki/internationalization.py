@@ -15,6 +15,10 @@ from pywikibot import xmlreader
 pywikibot.config.family = "commons"
 pywikibot.config.mylang = "commons"
 
+
+pywikibot.config.maxthrottle = 20
+pywikibot.config.put_throttle = 2
+
 site = pywikibot.Site()
 site.login()
 
