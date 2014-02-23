@@ -6,10 +6,12 @@
 # https://creativecommons.org/licenses/by-sa/3.0/
 
 from __future__ import unicode_literals
+from json import dumps
 import re
 import mwparserfromhell
 import pywikibot
 from pywikibot import catlib
+from pywikibot.data.api import Request
 
 
 pywikibot.config.family = "commons"
@@ -74,6 +76,26 @@ class RenameCategoryBot(object):
                 catCode.remove(template)
         self.newCat.put(unicode(catCode), summary)
 
+    def updateWikidata(self):
+        itemOld = pywikibot.ItemPage.fromPage(self.oldCat)
+        itemNew = pywikibot.ItemPage.fromPage(self.newCat)
+        if itemNew.exists():
+            itemNew.editclaim(31, 4167836)
+            itemNew.editclaim(373, self.newCat.title(withNamespace=False))
+            return
+        elif itemOld.exists():
+            itemOld.setSitelink(
+                sitelink={"site": site.dbName(), "title": self.newCat.title()},
+                summary="Wikimedia Commons category moved"
+            )
+        else:
+            itemNew.setSitelink(
+                sitelink={"site": site.dbName(), "title": self.newCat.title()},
+                summary="Importing category from Wikimedia Commons"
+            )
+            itemNew.editclaim(31, 4167836)
+            itemNew.editclaim(373, self.newCat.title(withNamespace=False))
+
     def run(self):
         queueText = self.queuePage.get(force = True)
         queueCode = mwparserfromhell.parse(queueText)
@@ -116,6 +138,7 @@ class RenameCategoryBot(object):
                             " (given reason: '%s')" % reason if reason else ""
                         )
                     )
+            self.updateWikidata()
             if self.oldCat.exists() and not (list(self.oldCat.articles()) or list(self.oldCat.subcategories())):
                 oldCatText = self.oldCat.get().lower()
                 if not (re.search("bad\s?name", oldCatText) or "redir" in oldCatText):
