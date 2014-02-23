@@ -80,21 +80,20 @@ class RenameCategoryBot(object):
         itemOld = pywikibot.ItemPage.fromPage(self.oldCat)
         itemNew = pywikibot.ItemPage.fromPage(self.newCat)
         if itemNew.exists():
-            itemNew.editclaim(31, 4167836)
-            itemNew.editclaim(373, self.newCat.title(withNamespace=False))
             return
         elif itemOld.exists():
             itemOld.setSitelink(
                 sitelink={"site": site.dbName(), "title": self.newCat.title()},
                 summary="Wikimedia Commons category moved"
             )
+            itemNew.editClaim(373, self.newCat.title(withNamespace=False))
         else:
             itemNew.setSitelink(
                 sitelink={"site": site.dbName(), "title": self.newCat.title()},
                 summary="Importing category from Wikimedia Commons"
             )
-            itemNew.editclaim(31, 4167836)
-            itemNew.editclaim(373, self.newCat.title(withNamespace=False))
+            itemNew.editClaim(31, 4167836)
+            itemNew.editClaim(373, self.newCat.title(withNamespace=False))
 
     def run(self):
         queueText = self.queuePage.get(force = True)
