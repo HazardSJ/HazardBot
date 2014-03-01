@@ -75,7 +75,8 @@ class SandBot(object):
                     "Template talk:X9": "general",
                     "Template talk:X10": "general",
                     "Template talk:X11": "general",
-                    "Template talk:X12": "general"
+                    "Template talk:X12": "general",
+                    "User:Sandbox": "general"
                 },
                 "groups": {
                     "general": u"{{subst:Sandbox reset}}",
