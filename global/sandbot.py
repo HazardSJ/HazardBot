@@ -87,9 +87,13 @@ class SandBot(object):
                 "site": pywikibot.Site("mediawiki", "mediawiki"),
                 "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
                 "sandbots": ["Hazard-Bot"],
-                "sandboxes": {"Project:Sandbox": "general"},
+                "sandboxes": {
+                    "Project:Sandbox": "general",
+                    "VisualEditor:Test": "visualeditor"
+                },
                 "groups": {
-                    "general": "{{Please leave this line alone and write below (this is the coloured heading)}}"
+                    "general": "{{Please leave this line alone and write below (this is the coloured heading)}}",
+                    "visualeditor": "{{subst:VisualEditor:Test/Text}}"
                 }
             },
             "nlwiki": {
