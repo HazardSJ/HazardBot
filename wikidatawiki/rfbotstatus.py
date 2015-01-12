@@ -30,7 +30,7 @@ for this in rfbotCode.ifilter_templates():
             requests.append(this.name.strip().split("/")[-1])
 
 template = """\
-{| border="1" class="wikitable sortable plainlinks"
+{| border="1" class="wikitable sortable"
 !Bot Name !! Request created !! Last editor !! Last edited
 %s
 |}
@@ -55,10 +55,10 @@ for request in requests:
     request,
     str(created)[:10] + ", " + str(created)[11:19],
     editor,
-    "[{{SERVER}}/wiki/?diff=" + str(edit) + " " + str(edited)[:10] + ", " + str(edited)[11:19] +"]"
+    "[[Special:Diff/%s|%s, %s]]" % (edit, str(edited)[:10], str(edited)[11:19])
 )
     rows.append(row)
-   
+
 status = template % "\n".join(rows)
 statusPage.put(status, comment="[[Wikidata:Bots|Bot]]: Updating RFBOT status")
 pywikibot.stopme()
