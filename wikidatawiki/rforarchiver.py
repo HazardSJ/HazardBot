@@ -24,7 +24,6 @@ class RFORArchiverBot(object):
         self.basePage = pywikibot.Page(site, "Wikidata:Requests for permissions")
         self.requestsPage = pywikibot.Page(site, self.basePage.title() + "/Other rights")
         self.archiveTitles = {
-            "autopatrolled": self.basePage.title() + "/RfAutopatrol/%s",
             "confirmed": self.basePage.title() + "/RfConfirmed/%s",
             # "ipblock-exempt": self.basePage.title() + "",  # Not archived currently
             "propertycreator": self.basePage.title() + "/RfPropertyCreator/%s",
@@ -40,9 +39,7 @@ class RFORArchiverBot(object):
         text = self.requestsPage.get()
         code = mwparserfromhell.parser.Parser().parse(text, skip_style_tags=True)
         for section in code.get_sections(levels=[2]):
-            if "autopatrol" in section.filter_headings()[0].title.lower():
-                group = "autopatrolled"
-            elif "confirmed" in section.filter_headings()[0].title.lower():
+            if "confirmed" in section.filter_headings()[0].title.lower():
                 group = "confirmed"
             elif "property" in section.filter_headings()[0].title.lower():
                 group = "propertycreator"
@@ -51,7 +48,7 @@ class RFORArchiverBot(object):
             else:
                 continue
             archivable = list()
-            for discussion in section.get_sections(levels=[3]):
+            for discussion in section.get_sections(levels=[4]):
                 templates = [template.name.lower().strip() for template in discussion.ifilter_templates()]
                 if not ("done" in templates or "not done" in templates):
                     continue
@@ -62,11 +59,11 @@ class RFORArchiverBot(object):
                     [datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y") for timestamp in timestamps]
                 )
                 if (datetime.utcnow() - timestamps[-1]).days >= 5:
-                    archivable.append(unicode(discussion))
+                    archivable.append(discussion)
             if not archivable:
                 continue
             for remove in archivable:
-                code.replace(remove, "")
+                code.remove(remove)
             archive = pywikibot.Page(
                 site,
                 self.archiveTitles[group] % datetime.utcnow().strftime("%B %Y")
