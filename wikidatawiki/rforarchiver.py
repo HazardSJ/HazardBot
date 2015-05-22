@@ -62,8 +62,6 @@ class RFORArchiverBot(object):
                     archivable.append(discussion)
             if not archivable:
                 continue
-            for remove in archivable:
-                code.remove(remove)
             archive = pywikibot.Page(
                 site,
                 self.archiveTitles[group] % datetime.utcnow().strftime("%B %Y")
@@ -72,12 +70,14 @@ class RFORArchiverBot(object):
                 archiveText = archive.get()
             else:
                 archiveText = self.archiveText
-            archiveText += "\n\n"
-            archiveCode = mwparserfromhell.parse(archiveText)
+                archiveText += "\n\n"
+                archiveCode = mwparserfromhell.parse(archiveText)
             for add in archivable:
                 append = unicode(add).strip()
                 if not append in unicode(archiveCode):
                     archiveCode.append(append + "\n\n")
+            for remove in archivable:
+                code.remove(remove)
             archive.put(
                 unicode(archiveCode),
                 "[[Wikidata:Bots|Bot]]: Archiving from %s" % self.requestsPage.title(asLink=True)
