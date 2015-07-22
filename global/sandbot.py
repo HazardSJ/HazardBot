@@ -89,11 +89,11 @@ class SandBot(object):
                 "sandbots": ["Hazard-Bot"],
                 "sandboxes": {
                     "Project:Sandbox": "general",
-                    "VisualEditor:Test": "visualeditor"
+                    "Project:VisualEditor testing/Test": "visualeditor"
                 },
                 "groups": {
                     "general": "{{Please leave this line alone and write below (this is the coloured heading)}}",
-                    "visualeditor": "{{subst:VisualEditor:Test/Text}}"
+                    "visualeditor": "{{subst:Project:VisualEditor testing/Test/Text}}"
                 }
             },
             "nlwiki": {
