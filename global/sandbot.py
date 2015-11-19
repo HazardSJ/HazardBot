@@ -38,7 +38,7 @@ class SandBot(object):
             "enwiki": {
                 "site": pywikibot.Site("en", "wikipedia"),
                 "dotask": "User:Hazard-Bot/DoTask/SandBot",
-                "sandbots": ["Addbot", "AvicBot2", "Hazard-Bot", "Lowercase sigmabot II"],
+                "sandbots": ["Addbot", "AvicBot2", "Cyberbot I", "Hazard-Bot", "Lowercase sigmabot II"],
                 "sandboxes": {
                     "Project:Sandbox": "general",
                     "Project talk:Sandbox": "general",
