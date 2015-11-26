@@ -109,12 +109,12 @@ class AlpsMountainsBot(object):
             else:
                 summary = "Updated"
 
-            if talk_text.strip() != talk_code:
+            if talk_text != talk_code:
                 try:
                     print(talk.title())
                 except UnicodeEncodeError:
                     pass
-                pywikibot.showDiff(talk_text.strip(), talk_code.strip())
+                pywikibot.showDiff(talk_text, talk_code)
                 talk.put(
                     talk_code,
                     "[[Wikipedia:Bots|Bot]]: %s {{WikiProject Mountains}} template " % summary +
