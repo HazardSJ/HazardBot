@@ -6,15 +6,15 @@
 # https://creativecommons.org/licenses/by-sa/3.0/
 
 
+from __future__ import unicode_literals
 import re
+
 import mwparserfromhell
 import pywikibot
 from pywikibot import xmlreader
 
-
 pywikibot.config.family = "commons"
 pywikibot.config.mylang = "commons"
-
 
 pywikibot.config.maxthrottle = 20
 pywikibot.config.put_throttle = 2
@@ -22,23 +22,24 @@ pywikibot.config.put_throttle = 2
 site = pywikibot.Site()
 site.login()
 
+
 class InternationalizationBot(object):
     def __init__(self):
-        self.dumpFile = "/public/datasets/public/commonswiki/20140210/commonswiki-20140210-pages-articles.xml.bz2"
+        self.dumpFile = "/public/dumps/public/commonswiki/20151102/commonswiki-20151102-pages-articles.xml.bz2"
         self.loadFileTranslations()
 
     def loadFileTranslations(self):
-        print "Loading translations of the 'File' namespace ..."
+        print("Loading translations of the 'File' namespace ...")
         self.fileTranslations = list()
         for lang in pywikibot.Site("en", "wikipedia").family.langs:
             self.fileTranslations.append(
                 pywikibot.Site(lang, "wikipedia").namespace(6).lower()
             )
         self.fileTranslations = list(set(self.fileTranslations))
-        print "... translations loaded."
+        print("... translations loaded.")
         
     def fixFileTranslations(self):
-        text = unicode(self.code)
+        text = self.code.__unicode__()
         galleries = re.findall(
             "<gallery>\s*(.*?)\s*</gallery>",
             text,
@@ -77,24 +78,24 @@ class InternationalizationBot(object):
                 for param in template.params:
                     if param.name.lower().strip() == "source":
                         if param.value.lower().strip() == "own work":
-                            param.value = unicode(param.value).replace(
+                            param.value = param.value.replace(
                                 param.value.strip(),
                                 "{{own}}"
                             )
                         elif param.value.lower().strip() == "unknown":
-                            param.value = unicode(param.value).replace(
+                            param.value = param.value.replace(
                                 param.value.strip(),
                                 "{{unknown|1=source}}"
                             )
                     elif param.name.lower().strip() == "author":
                         if param.value.lower().strip() == "unknown":
-                            param.value = unicode(param.value).replace(
+                            param.value = param.value.replace(
                                 param.value.strip(),
                                 "{{unknown|1=author}}"
                             )
                     elif param.name.lower().strip() == "permission":
                         if param.value.lower().strip() == "see below":
-                            param.value = unicode(param.value).replace(
+                            param.value = param.value.replace(
                                 param.value.strip(),
                                 ""
                             )
@@ -104,16 +105,16 @@ class InternationalizationBot(object):
         oldCode = self.code
         try:
             self.fixFileTranslations()
-        except (Exception, pywikibot.Error), error:
-            print "\nError: %s\n" % error
+        except (Exception, pywikibot.Error) as error:
+            print("\nError: %s\n" % error)
         try:
             self.fixHeadings()
-        except (Exception, pywikibot.Error), error:
-            print "\nError: %s\n" % error
+        except (Exception, pywikibot.Error) as error:
+            print("\nError: %s\n" % error)
         try:
             self.fixParameters()
-        except (Exception, pywikibot.Error), error:
-            print "\nError: %s\n" % error
+        except (Exception, pywikibot.Error) as error:
+            print("\nError: %s\n" % error)
         if oldCode == self.code:
             return False
         else:
@@ -130,30 +131,30 @@ class InternationalizationBot(object):
 
     def run(self):
         for title in self.generator():
-            print
+            print()
             page = pywikibot.Page(site, title)
             try:
-                print page.title()
+                print(page.title())
             except (UnicodeDecodeError, UnicodeEncodeError):
-                print "(page_title)"
+                print("(page_title)")
             try:
                 text = page.get()
-            except (Exception, pywikibot.Error), error:
-                print "\nError: %s\n" % error
+            except (Exception, pywikibot.Error) as error:
+                print("\nError: %s\n" % error)
                 continue
             else:
                 if not page.exists():
-                    print "\nError: The page does not exist.\n" % error
+                    print("\nError: The page does not exist.\n" % error)
                     continue
             if self.makeFixes(text):
-                pywikibot.showDiff(text, unicode(self.code))
+                pywikibot.showDiff(text, self.code)
                 try:
                     page.put(
-                        unicode(self.code),
-                        comment="[[Commons:Bots|Bot]]: Applied fixes for [[Commons:Template i18n|internationalization support]]"
+                        self.code,
+                        "[[Commons:Bots|Bot]]: Applied fixes for [[Commons:Template i18n|internationalization support]]"
                     )
-                except (Exception, pywikibot.Error), error:
-                    print "\nError: %s\n" % error
+                except (Exception, pywikibot.Error) as error:
+                    print("\nError: %s\n" % error)
 
 
 def main():
