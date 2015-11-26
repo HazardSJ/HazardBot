@@ -154,7 +154,10 @@ class InternationalizationBot(object):
                         "[[Commons:Bots|Bot]]: Applied fixes for [[Commons:Template i18n|internationalization support]]"
                     )
                 except (Exception, pywikibot.Error) as error:
-                    print("\nError: %s\n" % error)
+                    try:
+                        print("\nError: %s\n" % error)
+                    except UnicodeError:
+                        pass
 
 
 def main():
