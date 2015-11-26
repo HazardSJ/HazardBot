@@ -78,24 +78,24 @@ class InternationalizationBot(object):
                 for param in template.params:
                     if param.name.lower().strip() == "source":
                         if param.value.lower().strip() == "own work":
-                            param.value = param.value.replace(
+                            param.value.replace(
                                 param.value.strip(),
                                 "{{own}}"
                             )
                         elif param.value.lower().strip() == "unknown":
-                            param.value = param.value.replace(
+                            param.value.replace(
                                 param.value.strip(),
                                 "{{unknown|1=source}}"
                             )
                     elif param.name.lower().strip() == "author":
                         if param.value.lower().strip() == "unknown":
-                            param.value = param.value.replace(
+                            param.value.replace(
                                 param.value.strip(),
                                 "{{unknown|1=author}}"
                             )
                     elif param.name.lower().strip() == "permission":
                         if param.value.lower().strip() == "see below":
-                            param.value = param.value.replace(
+                            param.value.replace(
                                 param.value.strip(),
                                 ""
                             )
@@ -124,18 +124,18 @@ class InternationalizationBot(object):
         dump = xmlreader.XmlDump(self.dumpFile)
         gen = dump.parse()
         for page in gen:
-            if not page.ns in ["0", "6"]:
+            if page.ns not in ("0", "6"):
                 continue
             if self.makeFixes(page.text):
                 yield page.title
 
     def run(self):
         for title in self.generator():
-            print()
+            print("\n")
             page = pywikibot.Page(site, title)
             try:
                 print(page.title())
-            except (UnicodeDecodeError, UnicodeEncodeError):
+            except UnicodeError:
                 print("(page_title)")
             try:
                 text = page.get()
