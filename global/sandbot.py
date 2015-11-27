@@ -131,7 +131,7 @@ class SandBot(object):
 
     def checkDoTaskPage(self):
         if not self.doTaskPage:
-            print "Note: No do-task page has been configured."
+            print("Note: No do-task page has been configured.")
             return True
         try:
            text = self.doTaskPage.get(force = True)
@@ -159,10 +159,10 @@ class SandBot(object):
                     group = self.config[self.dbName]["sandboxes"][title]
                     groupText = self.config[self.dbName]["groups"][group]
                     if text.strip() == groupText.strip():
-                        print "Skipping [[%s]]: Sandbox is clean" % title
+                        print("Skipping [[%s]]: Sandbox is clean" % title)
                         continue
                     elif sandbox.userName() in self.sandbots:
-                        print "Skipping [[%s]]: Sandbot version" % title
+                        print("Skipping [[%s]]: Sandbot version" % title)
                         continue
                     else:
                         diff = datetime.utcnow() - sandbox.editTime()
@@ -171,21 +171,22 @@ class SandBot(object):
                                 sandbox.put(groupText, comment=self.editsummary)
                             except pywikibot.EditConflict:
                                 self.recheck.append(title)
-                                print "Delaying [[%s]]: Edit conflict encountered" % title
+                                print("Delaying [[%s]]: Edit conflict encountered" % title)
                         else:
                             self.recheck.append(title)
-                            print "Delaying [[%s]]: Sandbox may still be in use" % title
+                            print("Delaying [[%s]]: Sandbox may still be in use" % title)
                 except pywikibot.NoPage:
-                    print "Skipping [[%s]]: Non-existent sandbox" % title
+                    print("Skipping [[%s]]: Non-existent sandbox" % title)
 
         cleanSandboxes()
         rechecks = 0
         while (len(self.recheck) > 0) and (rechecks > 2):
             rechecks += 1
             pause = self.delay * 60
-            print "Pausing %i seconds to recheck %i sandboxes %s" % (pause, len(self.recheck), tuple(self.recheck))
+            print("Pausing %i seconds to recheck %i sandboxes %s" % (pause, len(self.recheck), tuple(self.recheck)))
             sleep(pause)
             cleanSandboxes(self.recheck)
+
 
 class SandHeaderBot(object):
     def __init__(self, dbName):
@@ -193,7 +194,7 @@ class SandHeaderBot(object):
         self.config = {
             "enwiki": {}
         }
-            
+
 
 
 def main():
@@ -206,13 +207,19 @@ def main():
         if "--header" in sys.argv:
             header = True
     else:
-        dbName = raw_input("Enter the database name (without '_p'): ")
+        # Whether Python 2 or 3, we want the string
+        try:
+            input = raw_input
+        except NameError:
+            pass
+
+        dbName = input("Enter the database name (without '_p'): ")
         if dbName in sandBotHeaderSites:
             header = input("Only insert header [True/False]: ")
-    if not dbName in sandBotSites:
+    if dbName not in sandBotSites:
         raise Exception("%s is not configured as a sandbot site.")
     if header:
-        if not dbName in sandBotHeaderSites:
+        if dbName not in sandBotHeaderSites:
             raise Exception("%s is not configured as a sandbot header site.")
         else:
             bot = SandHeaderBot(dbName)
