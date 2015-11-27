@@ -20,8 +20,10 @@ class AlpsMountainsBot(object):
         self.site = pywikibot.Site()
         wp_template = pywikibot.Page(site, "Template:WikiProject Mountains")
         shell_template = pywikibot.Page(site, "Template:WikiProject Mountains")
+        group_template = pywikibot.Page(site, "Template:WikiProjectBanners")
         self.wp_template_titles = self._get_titles(wp_template)
         self.shell_titles = self._get_titles(shell_template)
+        self.group_titles = self._get_titles(group_template)
         self.added_template = mwparserfromhell.parse(
             "{{WikiProject Mountains|class=|importance=|alps=yes|alps-importance=}}")
 
@@ -52,7 +54,7 @@ class AlpsMountainsBot(object):
             found = False
             shell = None
             for template in talk_code.ifilter_templates():
-                if template.name.lower().strip() in self.shell_titles:
+                if template.name.lower().strip() in self.shell_titles + self.group_titles:
                     shell = template
                 if not template.name.lower().strip() in self.wp_template_titles:
                     continue
@@ -76,7 +78,7 @@ class AlpsMountainsBot(object):
                 if stub:
                     self.added_template.filter_templates()[0].add("class", "stub")
 
-                # If there is a WikiProjectBannerShell, use it.
+                # If there is a WikiProjectBannerShell (or WikiProjectBanners), use it.
                 if shell is not None:
                     shell = mwparserfromhell.parse(shell)
                     shell = shell.nodes[0]
