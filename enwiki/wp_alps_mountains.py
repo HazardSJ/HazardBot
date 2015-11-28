@@ -117,11 +117,14 @@ class AlpsMountainsBot(object):
                 except UnicodeEncodeError:
                     pass
                 pywikibot.showDiff(talk_text, talk_code)
-                talk.put(
-                    talk_code,
-                    "[[Wikipedia:Bots|Bot]]: %s {{WikiProject Mountains}} template " % summary +
-                    "([[Wikipedia talk:WikiProject Mountains|discussion]])"
-                )
+                try:
+                    talk.put(
+                        talk_code,
+                        "[[Wikipedia:Bots|Bot]]: %s {{WikiProject Mountains}} template " % summary +
+                        "([[Wikipedia talk:WikiProject Mountains|discussion]])"
+                    )
+                except pywikibot.OtherPageSaveError:
+                    print("The page save reported an error.")
             else:
                 try:
                     print(talk.title() + " (no edits)")
