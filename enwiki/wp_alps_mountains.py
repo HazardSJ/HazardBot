@@ -42,6 +42,8 @@ class AlpsMountainsBot(object):
             else:
                 talk = page.toggleTalkPage()
             article = talk.toggleTalkPage()
+            if article.isRedirectPage():
+                continue
 
             try:
                 talk_text = talk.get()
@@ -97,16 +99,16 @@ class AlpsMountainsBot(object):
                                 before = t
                                 break
                         if before is not None:
-                            lead_section.insert_before(before, str(self.added_template)+"\n")
+                            lead_section.insert_before(before, str(self.added_template) + "\n")
                         elif after is not None:
-                            lead_section.insert_after(after, "\n"+str(self.added_template))
+                            lead_section.insert_after(after, "\n" + str(self.added_template))
                         else:
                             if not lead_section.endswith("\n"):
                                 lead_section.append("\n")
                             lead_section.append(self.added_template)
                             lead_section.append("\n\n")
                     else:
-                        lead_section.insert(0, str(self.added_template)+"\n\n")
+                        lead_section.insert(0, str(self.added_template) + "\n\n")
                 summary = "Added"
             else:
                 summary = "Updated"
