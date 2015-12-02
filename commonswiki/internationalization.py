@@ -25,7 +25,7 @@ site.login()
 
 class InternationalizationBot(object):
     def __init__(self):
-        self.dumpFile = "/public/dumps/public/commonswiki/20151102/commonswiki-20151102-pages-articles.xml.bz2"
+        self.dumpFile = "/public/dumps/public/commonswiki/20151123/commonswiki-20151123-pages-articles.xml.bz2"
         self.loadFileTranslations()
 
     def loadFileTranslations(self):
