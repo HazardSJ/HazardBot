@@ -17,6 +17,7 @@ site.login()
 class UserSandboxTemplateFixer(object):
     def __init__(self):
         self.user_sandbox_template = pywikibot.Page(site, "Template:User sandbox")
+        self.user_sandbox_template_titles = self._get_titles(self.user_sandbox_template)
         self.sandbox_heading_template = pywikibot.Page(site, "Template:Sandbox heading")
         self.sandbox_heading_template_titles = self._get_titles(self.sandbox_heading_template)
 
@@ -26,6 +27,25 @@ class UserSandboxTemplateFixer(object):
         for reference in template.getReferences(withTemplateInclusion=False, redirectsOnly=True):
             titles.append(reference.title(withNamespace=False).lower())
         return list(set(titles))
+
+    def has_user_sandbox_template(self, code):
+        for template in code.ifilter_templates():
+            if template.name.lower().strip() in self.user_sandbox_template_titles:
+                return True
+        return False
+
+    def replace_first_sandbox_heading_template(self, code):
+        for template in code.ifilter_templates():
+            if template.name.lower().strip() in self.sandbox_heading_template_titles:
+                template.name.replace(template.name.strip(), self.user_sandbox_template.title(withNamespace=False))
+                break
+        return code
+
+    def remove_sandbox_heading_templates(self, code):
+        for template in code.ifilter_templates():
+            if template.name.lower().strip() in self.sandbox_heading_template_titles:
+                code.remove(template)
+        return code
 
     def run(self):
         for page in self.sandbox_heading_template.getReferences(onlyTemplateInclusion=True, namespaces=[2,3]):
@@ -44,16 +64,23 @@ class UserSandboxTemplateFixer(object):
             else:
                 code = mwparserfromhell.parse(text)
 
-            for template in code.ifilter_templates():
-                if template.name.lower().strip() in self.sandbox_heading_template_titles:
-                    template.name.replace(template.name.strip(), self.user_sandbox_template.title(withNamespace=False))
+            if not self.has_user_sandbox_template(code):
+                code = self.replace_first_sandbox_heading_template(code)
+                replaced = True
+            else:
+                replaced = False
+
+            code = self.remove_sandbox_heading_templates(code)
 
             if text != code:
                 try:
+                    if replaced:
+                        summary = "Replacing standard sandbox template with %s"
+                    else:
+                        summary = "Removing standard sandbox template (%s is already present)"
                     page.put(
                         code,
-                        "[[Wikipedia:Bots|Bot]]: Replacing standard sandbox template with %s" %
-                            self.user_sandbox_template.title(asLink=True)
+                        "[[Wikipedia:Bots|Bot]]: %s" % (summary % self.user_sandbox_template.title(asLink=True))
                     )
                 except pywikibot.Error:
                     continue
