@@ -1,32 +1,31 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Published by Hazard-SJ (https://wikitech.wikimedia.org/wiki/User:Hazard-SJ)
 # under the terms of Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
 # https://creativecommons.org/licenses/by-sa/3.0/
 
-
 import sys
-import pywikibot
 from datetime import datetime
 from time import sleep
 
+import pywikibot
+
 
 class SandBot(object):
-    def __init__(self, dbName):
-        self.loadConfig()
-        self.dbName = dbName
-        self.site = self.config[dbName]["site"]
+    def __init__(self, db_name):
+        self.load_config()
+        self.db_name = db_name
+        self.site = self.config[db_name]["site"]
         self.site.login()
-        self.editsummary = pywikibot.i18n.twtranslate(self.site.language(), "clean_sandbox-cleaned")
-        self.sandbots = self.config[dbName]["sandbots"]
-        if self.config[dbName]["dotask"]:
-            self.doTaskPage = pywikibot.Page(self.site, self.config[dbName]["dotask"])
+        self.edit_summary = pywikibot.i18n.twtranslate(self.site.language(), "clean_sandbox-cleaned")
+        self.sandbots = self.config[db_name]["sandbots"]
+        if self.config[db_name]["dotask"]:
+            self.do_task_page = pywikibot.Page(self.site, self.config[db_name]["dotask"])
         else:
-            self.doTaskPage = None
+            self.do_task_page = None
         self.delay = 5
 
-    def loadConfig(self):
+    def load_config(self):
         self.config = {
             "commonswiki": {
                 "site": pywikibot.Site("commons", "commons"),
@@ -129,36 +128,36 @@ class SandBot(object):
             }
         }
 
-    def checkDoTaskPage(self):
-        if not self.doTaskPage:
+    def check_do_task_page(self):
+        if not self.do_task_page:
             print("Note: No do-task page has been configured.")
             return True
         try:
-           text = self.doTaskPage.get(force = True)
+            text = self.do_task_page.get(force = True)
         except pywikibot.IsRedirectPage:
-            raise Warning("The 'do-task page' (%s) is a redirect." % self.doTaskPage.title(asLink = True))
+            raise Warning("The 'do-task page' (%s) is a redirect." % self.do_task_page.title(asLink = True))
         except pywikibot.NoPage:
-            raise Warning("The 'do-task page' (%s) does not exist." % self.doTaskPage.title(asLink = True))
+            raise Warning("The 'do-task page' (%s) does not exist." % self.do_task_page.title(asLink = True))
         else:
             if text.strip().lower() == "true":
                 return True
             else:
-                raise Exception("The task has been disabled from the 'do-task page' (%s)."
-                    % self.doTaskPage.title(asLink = True)
-                )
+                raise Exception("The task has been disabled from the 'do-task page' (%s)." %
+                                self.do_task_page.title(asLink=True)
+                                )
 
     def run(self):
-        self.checkDoTaskPage()
+        self.check_do_task_page()
 
-        def cleanSandboxes(titles = self.config[self.dbName]["sandboxes"].keys()):
+        def clean_sandboxes(titles=self.config[self.db_name]["sandboxes"].keys()):
             self.recheck = list()
             for title in titles:
                 sandbox = pywikibot.Page(self.site, title)
                 try:
                     text = sandbox.get()
-                    group = self.config[self.dbName]["sandboxes"][title]
-                    groupText = self.config[self.dbName]["groups"][group]
-                    if text.strip() == groupText.strip():
+                    group = self.config[self.db_name]["sandboxes"][title]
+                    group_text = self.config[self.db_name]["groups"][group]
+                    if text.strip() == group_text.strip():
                         print("Skipping [[%s]]: Sandbox is clean" % title)
                         continue
                     elif sandbox.userName() in self.sandbots:
@@ -168,7 +167,7 @@ class SandBot(object):
                         diff = datetime.utcnow() - sandbox.editTime()
                         if (diff.seconds/60) >= self.delay:
                             try:
-                                sandbox.put(groupText, comment=self.editsummary)
+                                sandbox.put(group_text, comment=self.edit_summary)
                             except pywikibot.EditConflict:
                                 self.recheck.append(title)
                                 print("Delaying [[%s]]: Edit conflict encountered" % title)
@@ -178,32 +177,30 @@ class SandBot(object):
                 except pywikibot.NoPage:
                     print("Skipping [[%s]]: Non-existent sandbox" % title)
 
-        cleanSandboxes()
+        clean_sandboxes()
         rechecks = 0
         while (len(self.recheck) > 0) and (rechecks > 2):
             rechecks += 1
             pause = self.delay * 60
             print("Pausing %i seconds to recheck %i sandboxes %s" % (pause, len(self.recheck), tuple(self.recheck)))
             sleep(pause)
-            cleanSandboxes(self.recheck)
+            clean_sandboxes(self.recheck)
 
 
 class SandHeaderBot(object):
-    def __init__(self, dbName):
-        self.dbName = dbName
+    def __init__(self, db_name):
+        self.db_name = db_name
         self.config = {
             "enwiki": {}
         }
 
 
-
 def main():
-    sandBotSites = ["commonswiki", "enwiki", "mediawikiwiki", "nlwiki", "simplewiki"]
-    sandBotHeaderSites = list()  # The class has not yet been completed  # ["enwiki"]
-    dbName = None
+    sandbot_sites = ["commonswiki", "enwiki", "mediawikiwiki", "nlwiki", "simplewiki"]
+    sandbot_header_sites = list()  # The class has not yet been completed  # ["enwiki"]
     header = False
     if len(sys.argv) > 1:
-        dbName = sys.argv[1]
+        db_name = sys.argv[1]
         if "--header" in sys.argv:
             header = True
     else:
@@ -213,18 +210,18 @@ def main():
         except NameError:
             pass
 
-        dbName = input("Enter the database name (without '_p'): ")
-        if dbName in sandBotHeaderSites:
+        db_name = input("Enter the database name (without '_p'): ")
+        if db_name in sandbot_header_sites:
             header = input("Only insert header [True/False]: ")
-    if dbName not in sandBotSites:
+    if db_name not in sandbot_sites:
         raise Exception("%s is not configured as a sandbot site.")
     if header:
-        if dbName not in sandBotHeaderSites:
+        if db_name not in sandbot_header_sites:
             raise Exception("%s is not configured as a sandbot header site.")
         else:
-            bot = SandHeaderBot(dbName)
+            bot = SandHeaderBot(db_name)
     else:
-        bot = SandBot(dbName)
+        bot = SandBot(db_name)
     bot.run()
 
 if __name__ == "__main__":
