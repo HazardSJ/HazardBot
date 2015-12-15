@@ -196,9 +196,9 @@ class SandHeaderBot(SandBot):
             "enwiki": {
                 "site": pywikibot.Site("en", "wikipedia"),
                 "dotask": "User:Hazard-Bot/DoTask/SandBot",
-                "edit_summary": "Testing",  # "edit_summary": "[[Wikipedia:Bots|Bot]]: Reinserting sandbox header",
+                "edit_summary": "[[Wikipedia:Bots|Bot]]: Reinserting sandbox header",
                 "template": "Template:Sandbox heading",
-                "sandboxes": {"User:Hazard-SJ/sandbox": "general"},  # "sandboxes": {"Project:Sandbox": "general"},
+                "sandboxes": {"Project:Sandbox": "general"},
                 "groups": {"general": "{{subst:Sandbox reset}}"}
             }
         }
