@@ -5,6 +5,7 @@
 # https://creativecommons.org/licenses/by-sa/3.0/
 
 import sys
+from re import findall
 from datetime import datetime
 from time import sleep
 
@@ -75,11 +76,12 @@ class SandBot(object):
                     "Template talk:X10": "general",
                     "Template talk:X11": "general",
                     "Template talk:X12": "general",
-                    "User:Sandbox": "general"
+                    "User:Sandbox": "general",
+                    "User talk:Sandbox": "general"
                 },
                 "groups": {
-                    "general": u"{{subst:Sandbox reset}}",
-                    "template": u"{{subst:Template sandbox reset}}"
+                    "general": "{{subst:Sandbox reset}}",
+                    "template": "{{subst:Template sandbox reset}}"
                 }
             },
             "mediawikiwiki": {
@@ -133,7 +135,7 @@ class SandBot(object):
             print("Note: No do-task page has been configured.")
             return True
         try:
-            text = self.do_task_page.get(force = True)
+            text = self.do_task_page.get(force=True)
         except pywikibot.IsRedirectPage:
             raise Warning("The 'do-task page' (%s) is a redirect." % self.do_task_page.title(asLink = True))
         except pywikibot.NoPage:
@@ -167,7 +169,7 @@ class SandBot(object):
                         diff = datetime.utcnow() - sandbox.editTime()
                         if (diff.seconds/60) >= self.delay:
                             try:
-                                sandbox.put(group_text, comment=self.edit_summary)
+                                sandbox.put(group_text, self.edit_summary)
                             except pywikibot.EditConflict:
                                 self.recheck.append(title)
                                 print("Delaying [[%s]]: Edit conflict encountered" % title)
@@ -187,17 +189,53 @@ class SandBot(object):
             clean_sandboxes(self.recheck)
 
 
-class SandHeaderBot(object):
+class SandHeaderBot(SandBot):
     def __init__(self, db_name):
         self.db_name = db_name
         self.config = {
-            "enwiki": {}
+            "enwiki": {
+                "site": pywikibot.Site("en", "wikipedia"),
+                "dotask": "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Testing",  # "edit_summary": "[[Wikipedia:Bots|Bot]]: Reinserting sandbox header",
+                "template": "Template:Sandbox heading",
+                "sandboxes": {"User:Hazard-SJ/sandbox": "general"},  # "sandboxes": {"Project:Sandbox": "general"},
+                "groups": {"general": "{{subst:Sandbox reset}}"}
+            }
         }
+        self.site = self.config[db_name]["site"]
+        self.site.login()
+        self.do_task_page = pywikibot.Page(self.site, self.config[db_name]["dotask"])
+        self.edit_summary = self.config[db_name]["edit_summary"]
+
+    def _get_titles(self, template):
+        """Gets a list of the lowercase titles of a template and its redirects"""
+        titles = [template.title(withNamespace=False).lower()]
+        for reference in template.getReferences(withTemplateInclusion=False, redirectsOnly=True):
+            titles.append(reference.title(withNamespace=False).lower())
+        return list(set(titles))
+
+    def run(self):
+        self.check_do_task_page()
+        for title in self.config[self.db_name]["sandboxes"].keys():
+            sandbox = pywikibot.Page(self.site, title)
+            text = sandbox.get(force=True)
+            found = False
+            for template in self._get_titles(pywikibot.Page(self.site, self.config[self.db_name]["template"])):
+                if findall("\{\{\s*%s\s*\}\}" % (template.replace("(", "\(").replace(")", "\)")), text.lower()):
+                    found = True
+                    break
+            if not found:
+                group = self.config[self.db_name]["sandboxes"][title]
+                group_text = self.config[self.db_name]["groups"][group]
+                try:
+                    sandbox.put("%s\n\n%s" % (group_text, text), self.edit_summary)
+                except pywikibot.Error:
+                    continue
 
 
 def main():
     sandbot_sites = ["commonswiki", "enwiki", "mediawikiwiki", "nlwiki", "simplewiki"]
-    sandbot_header_sites = list()  # The class has not yet been completed  # ["enwiki"]
+    sandbot_header_sites = ["enwiki"]
     header = False
     if len(sys.argv) > 1:
         db_name = sys.argv[1]
@@ -205,14 +243,21 @@ def main():
             header = True
     else:
         # Whether Python 2 or 3, we want the string
-        try:
-            input = raw_input
-        except NameError:
-            pass
+        def prompt(text):
+            try:
+                value = raw_input(text)
+            except NameError:
+                value = input(text)
+            finally:
+                return value
 
-        db_name = input("Enter the database name (without '_p'): ")
+        db_name = prompt("Enter the database name (without '_p'): ")
         if db_name in sandbot_header_sites:
-            header = input("Only insert header [True/False]: ")
+            header = prompt("Only insert header [True/False]: ")
+            if header.lower().startswith("t"):
+                header = True
+            else:
+                header = False
     if db_name not in sandbot_sites:
         raise Exception("%s is not configured as a sandbot site.")
     if header:
