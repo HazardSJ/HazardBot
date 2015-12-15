@@ -5,60 +5,71 @@
 # under the terms of Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
 # https://creativecommons.org/licenses/by-sa/3.0/
 
-
 import mwparserfromhell
 import pywikibot
 
-
 pywikibot.config.family = "wikidata"
 pywikibot.config.mylang = "wikidata"
-
 site = pywikibot.Site()
 site.login()
 
-rfbotPage = pywikibot.Page(site, "Wikidata:Requests for permissions/Bot")
-statusPage = pywikibot.Page(site, rfbotPage.title() + "/Status")
 
-rfbotCode = mwparserfromhell.parse(rfbotPage.get())
+class RFBOTStatusBot(object):
+    """Updates the RFBOT status page"""
 
-prefix = rfbotPage.title() + "/"
-requests = list()
-
-for this in rfbotCode.ifilter_templates():
-    if this.name.lower().strip().startswith(prefix.lower()):
-        if not ("header" in this.name.lower() or "status" in this.name.lower()):
-            requests.append(this.name.strip().split("/")[-1])
-
-template = """\
-{| border="1" class="wikitable sortable"
-!Bot Name !! Request created !! Last editor !! Last edited
+    def __init__(self):
+        self.rfbot_page = pywikibot.Page(site, "Wikidata:Requests for permissions/Bot")
+        self.status_page = pywikibot.Page(site, self.rfbot_page.title() + "/Status")
+        self.time_format = "%Y-%m-%d, %H:%M:%S"
+        self.table = """\
+{| class="wikitable sortable"
+! Bot Name !! Request created !! Last editor !! Last edited
 %s
 |}
 """
-data = list()
-rows = list()
-
-for request in requests:
-    page = pywikibot.Page(site, prefix + request)
-    if not page.exists():
-        continue
-    history = page.getVersionHistory()
-    created = history[-1][1]
-    edit = history[0][0]
-    edited = history[0][1]
-    editor = history[0][2]
-    row = """\
+        self.row = """\
 |-
-| [[%s|%s]] || %s || %s || %s\
-""" % (
-    page.title(),
-    request,
-    str(created)[:10] + ", " + str(created)[11:19],
-    editor,
-    "[[Special:Diff/%s|%s, %s]]" % (edit, str(edited)[:10], str(edited)[11:19])
-)
-    rows.append(row)
+| [[%(link)s|%(request)s]] || %(creation_date)s || %(last_editor)s || %(last_edited)s\
+"""
 
-status = template % "\n".join(rows)
-statusPage.put(status, comment="[[Wikidata:Bots|Bot]]: Updating RFBOT status")
-pywikibot.stopme()
+    def run(self):
+        requests = list()
+        prefix = self.rfbot_page.title() + "/"
+        rfbot_code = mwparserfromhell.parse(self.rfbot_page.get())
+
+        for template in rfbot_code.ifilter_templates():
+            if template.name.lower().strip().startswith(prefix.lower()):
+                if not ("header" in template.name.lower() or "status" in template.name.lower()):
+                    requests.append(template.name.strip().split("/")[-1])
+
+        rows = list()
+        for request in requests:
+            page = pywikibot.Page(site, prefix + request)
+            if not page.exists():
+                continue
+            first_edit = page.oldest_revision
+            last_edit = next(page.revisions(total=1))
+            rows.append(self.row % {
+                "link": page.title(),
+                "request": request,
+                "creation_date": first_edit.timestamp.strftime(self.time_format),
+                "last_editor": last_edit.user,
+                "last_edited": "[[Special:Diff/%s|%s]]" % (
+                    last_edit.revid,
+                    last_edit.timestamp.strftime(self.time_format)
+                )
+            })
+
+        status = self.table % ("\n".join(rows))
+        self.status_page.put(status, "[[Wikidata:Bots|Bot]]: Updating RFBOT status table")
+
+
+def main():
+    try:
+        bot = RFBOTStatusBot()
+        bot.run()
+    finally:
+        pywikibot.stopme()
+
+if __name__ == "__main__":
+    main()
