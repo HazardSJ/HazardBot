@@ -1,10 +1,8 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Published by Hazard-SJ (https://wikitech.wikimedia.org/wiki/User:Hazard-SJ)
 # under the terms of Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
 # https://creativecommons.org/licenses/by-sa/3.0/
-
 
 from __future__ import unicode_literals
 import re
@@ -25,20 +23,20 @@ site.login()
 
 class InternationalizationBot(object):
     def __init__(self):
-        self.dumpFile = "/public/dumps/public/commonswiki/20151123/commonswiki-20151123-pages-articles.xml.bz2"
-        self.loadFileTranslations()
+        self.dump_file = "/public/dumps/public/commonswiki/20151201/commonswiki-20151201-stub-articles.xml.gz"
+        self.load_file_translations()
 
-    def loadFileTranslations(self):
+    def load_file_translations(self):
         print("Loading translations of the 'File' namespace ...")
-        self.fileTranslations = list()
+        self.file_translations = list()
         for lang in pywikibot.Site("en", "wikipedia").family.langs:
-            self.fileTranslations.append(
+            self.file_translations.append(
                 pywikibot.Site(lang, "wikipedia").namespace(6).lower()
             )
-        self.fileTranslations = list(set(self.fileTranslations))
+        self.file_translations = list(set(self.file_translations))
         print("... translations loaded.")
         
-    def fixFileTranslations(self):
+    def fix_file_translations(self):
         text = self.code.__unicode__()
         galleries = re.findall(
             "<gallery>\s*(.*?)\s*</gallery>",
@@ -53,26 +51,26 @@ class InternationalizationBot(object):
                     continue
                 if namespace.lower().strip() in ["file", "image"]:
                     continue
-                elif namespace.lower().strip() in self.fileTranslations:
+                elif namespace.lower().strip() in self.file_translations:
                     namespace = namespace.replace(namespace.strip(), "File")
-                    newLine = ":".join([namespace, other])
-                    text = text.replace(gallery, gallery.replace(line, newLine))
+                    new_line = ":".join([namespace, other])
+                    text = text.replace(gallery, gallery.replace(line, new_line))
         self.code = mwparserfromhell.parse(text)
 
-    def fixHeadings(self):
+    def fix_headings(self):
         for heading in self.code.ifilter_headings():
-            headingTitle = heading.title.lower().strip()
-            if "license information" == headingTitle \
-            or "{{int:license}}" == headingTitle \
-            or "licensing" == headingTitle:
+            heading_title = heading.title.lower().strip()
+            if "license information" == heading_title \
+                    or "{{int:license}}" == heading_title \
+                    or "licensing" == heading_title:
                 heading.title = " {{int:license-header}} "
-            elif "original upload log" == headingTitle \
-            or "file history" == headingTitle:
+            elif "original upload log" == heading_title \
+                    or "file history" == heading_title:
                 heading.title = " {{original upload log}} "
-            elif "summary" == headingTitle:
+            elif "summary" == heading_title:
                 heading.title = " {{int:filedesc}} "
 
-    def fixParameters(self):
+    def fix_parameters(self):
         for template in self.code.ifilter_templates():
             if template.name.lower().strip() == "information":
                 for param in template.params:
@@ -100,33 +98,33 @@ class InternationalizationBot(object):
                                 ""
                             )
 
-    def makeFixes(self, text):
+    def make_fixes(self, text):
         self.code = mwparserfromhell.parse(text)
-        oldCode = self.code
+        old_code = self.code
         try:
-            self.fixFileTranslations()
+            self.fix_file_translations()
         except (Exception, pywikibot.Error) as error:
             print("\nError: %s\n" % error)
         try:
-            self.fixHeadings()
+            self.fix_headings()
         except (Exception, pywikibot.Error) as error:
             print("\nError: %s\n" % error)
         try:
-            self.fixParameters()
+            self.fix_parameters()
         except (Exception, pywikibot.Error) as error:
             print("\nError: %s\n" % error)
-        if oldCode == self.code:
+        if old_code == self.code:
             return False
         else:
             return True
 
     def generator(self):
-        dump = xmlreader.XmlDump(self.dumpFile)
+        dump = xmlreader.XmlDump(self.dump_file)
         gen = dump.parse()
         for page in gen:
             if page.ns not in ("0", "6"):
                 continue
-            if self.makeFixes(page.text):
+            if self.make_fixes(page.text):
                 yield page.title
 
     def run(self):
@@ -146,7 +144,7 @@ class InternationalizationBot(object):
                 if not page.exists():
                     print("\nError: The page does not exist.\n" % error)
                     continue
-            if self.makeFixes(text):
+            if self.make_fixes(text):
                 pywikibot.showDiff(text, self.code)
                 try:
                     page.put(

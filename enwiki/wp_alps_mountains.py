@@ -1,10 +1,8 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Published by Hazard-SJ (https://wikitech.wikimedia.org/wiki/User:Hazard-SJ)
 # under the terms of Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
 # https://creativecommons.org/licenses/by-sa/3.0/
-
 
 import mwparserfromhell
 import pywikibot

@@ -6,6 +6,7 @@
 # https://creativecommons.org/licenses/by-sa/3.0/
 
 import re
+
 import pywikibot
 
 pywikibot.config.family = "wikipedia"

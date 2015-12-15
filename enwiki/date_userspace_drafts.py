@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Published by Hazard-SJ (https://wikitech.wikimedia.org/wiki/User:Hazard-SJ)
