@@ -34,6 +34,14 @@ class AFDRelistedCatRemover(object):
                 continue
             yield page
 
+    def remove(self, pattern, text):
+        to_remove = list()
+        for cat in self.categories:
+            to_remove += re.findall(pattern % cat.title(), text)
+        for c in set(to_remove):
+                    text = text.replace(c, "")
+        return text
+
     def run(self):
         for category in self.categories:
             pywikibot.output(category.title(asLink=True) + "\n")
@@ -49,15 +57,12 @@ class AFDRelistedCatRemover(object):
                 except pywikibot.Error:
                     continue
 
-                to_remove = list()
-                for cat in self.categories:
-                    to_remove += re.findall("\[\[%s(?:\|.*?)?\]\]" % cat.title(), text)
-                    to_remove += re.findall("<noinclude>\[\[%s(?:\|.*?)?\]\]</noinclude>" % cat.title(), text)
-                if not to_remove:
-                    continue
+                old_text = text
+                text = self.remove("<noinclude>\[\[%s(?:\|.*?)?\]\]</noinclude>", text)
+                text = self.remove("\[\[%s(?:\|.*?)?\]\]", text)
 
-                for c in set(to_remove):
-                    text = text.replace(c, "")
+                if old_text == text:
+                    continue
 
                 try:
                     page.put(text, "[[Wikipedia:Bots|Bot]]: Removing closed AfD from %s" % category.title(asLink=True))
