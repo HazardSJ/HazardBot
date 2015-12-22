@@ -41,7 +41,7 @@ class InternationalizationBot(object):
         galleries = re.findall(
             "<gallery>\s*(.*?)\s*</gallery>",
             text,
-            re.I|re.S
+            re.IGNORECASE | re.DOTALL
         )
         for gallery in galleries:
             for line in gallery.splitlines():
@@ -49,7 +49,7 @@ class InternationalizationBot(object):
                     namespace, other = line.split(":", 1)
                 except ValueError:
                     continue
-                if namespace.lower().strip() in ["file", "image"]:
+                if namespace.lower().strip() in ("file", "image"):
                     continue
                 elif namespace.lower().strip() in self.file_translations:
                     namespace = namespace.replace(namespace.strip(), "File")
@@ -60,14 +60,11 @@ class InternationalizationBot(object):
     def fix_headings(self):
         for heading in self.code.ifilter_headings():
             heading_title = heading.title.lower().strip()
-            if "license information" == heading_title \
-                    or "{{int:license}}" == heading_title \
-                    or "licensing" == heading_title:
+            if heading_title in ("{{int:license}}", "license information", "licensing"):
                 heading.title = " {{int:license-header}} "
-            elif "original upload log" == heading_title \
-                    or "file history" == heading_title:
+            elif heading_title in ("file history", "original upload log"):
                 heading.title = " {{original upload log}} "
-            elif "summary" == heading_title:
+            elif heading_title == "summary":
                 heading.title = " {{int:filedesc}} "
 
     def fix_parameters(self):
@@ -122,6 +119,8 @@ class InternationalizationBot(object):
         dump = xmlreader.XmlDump(self.dump_file)
         gen = dump.parse()
         for page in gen:
+            if page.isredirect:
+                continue
             if page.ns not in ("0", "6"):
                 continue
             if self.make_fixes(page.text):
@@ -131,19 +130,12 @@ class InternationalizationBot(object):
         for title in self.generator():
             print("\n")
             page = pywikibot.Page(site, title)
-            try:
-                print(page.title())
-            except UnicodeError:
-                print("(page_title)")
+            pywikibot.output(page.title())
             try:
                 text = page.get()
-            except (Exception, pywikibot.Error) as error:
-                print("\nError: %s\n" % error)
+            except pywikibot.Error as error:
+                pywikibot.output("\nError: %s\n" % error)
                 continue
-            else:
-                if not page.exists():
-                    print("\nError: The page does not exist.\n" % error)
-                    continue
             if self.make_fixes(text):
                 pywikibot.showDiff(text, self.code)
                 try:
@@ -151,11 +143,8 @@ class InternationalizationBot(object):
                         self.code,
                         "[[Commons:Bots|Bot]]: Applied fixes for [[Commons:Template i18n|internationalization support]]"
                     )
-                except (Exception, pywikibot.Error) as error:
-                    try:
-                        print("\nError: %s\n" % error)
-                    except UnicodeError:
-                        pass
+                except pywikibot.Error as error:
+                    pywikibot.output("\nError: %s\n" % error)
 
 
 def main():
