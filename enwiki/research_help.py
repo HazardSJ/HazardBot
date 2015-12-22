@@ -17,7 +17,7 @@ class ResearchHelpBot(object):
     """Adds {{Research help}} to articles from specific WikiProjects"""
 
     def __init__(self):
-        self.maximum_edits = 50  # Per-run based, will be divided equally among all WikiProjects.
+        self.maximum_edits = 100  # Per-run based, will be divided equally among all WikiProjects.
         self.groups = {
             "MED": {
                 "template": "{{Research help|Med}}",

@@ -34,7 +34,7 @@ class StartDateRemover(object):
         if template.has_param(1) and template.has_param(2) and template.has_param(3):
             date = {
                 "day": template.get(3).strip().lstrip("0"),
-                "month": "{{subst:MONTHNAME|%s}}" % template.get(2).strip(),
+                "month": site.expand_text("{{MONTHNAME|%s}}" % template.get(2).strip()),
                 "year": template.get(1).strip()
             }
             if template.has_param("df"):
@@ -44,18 +44,20 @@ class StartDateRemover(object):
         elif template.has_param(1) and template.has_param(2):
             if always_use_monthname:
                 return "%(month)s %(year)s" % {
-                    "month": "{{subst:MONTHNAME|%s}}" % template.get(2).strip(),
+                    "month": site.expand_text("{{MONTHNAME|%s}}" % template.get(2).strip()),
                     "year": template.get(1).strip()
                 }
             else:
                 month = template.get(2).value.strip()
-                if month:
+                try:
                     if int(month) < 10 and not month.startswith("0"):
                         month = "0" + month
                     return "%s %s" % (
                         template.get(1).value.strip(),
                         month
                     )
+                except ValueError:
+                    return None
         elif template.has_param(1):
             return template.get(1).strip()
         else:

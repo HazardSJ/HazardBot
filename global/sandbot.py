@@ -137,9 +137,9 @@ class SandBot(object):
         try:
             text = self.do_task_page.get(force=True)
         except pywikibot.IsRedirectPage:
-            raise Warning("The 'do-task page' (%s) is a redirect." % self.do_task_page.title(asLink = True))
+            raise Warning("The 'do-task page' (%s) is a redirect." % self.do_task_page.title(asLink=True))
         except pywikibot.NoPage:
-            raise Warning("The 'do-task page' (%s) does not exist." % self.do_task_page.title(asLink = True))
+            raise Warning("The 'do-task page' (%s) does not exist." % self.do_task_page.title(asLink=True))
         else:
             if text.strip().lower() == "true":
                 return True
