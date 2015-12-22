@@ -96,19 +96,19 @@ class InternationalizationBot(object):
                             )
 
     def make_fixes(self, text):
-        self.code = mwparserfromhell.parse(text)
+        self.code = mwparserfromhell.parse(text, skip_style_tags=True)
         old_code = self.code
         try:
             self.fix_file_translations()
-        except (Exception, pywikibot.Error) as error:
+        except Exception as error:
             print("\nError: %s\n" % error)
         try:
             self.fix_headings()
-        except (Exception, pywikibot.Error) as error:
+        except Exception as error:
             print("\nError: %s\n" % error)
         try:
             self.fix_parameters()
-        except (Exception, pywikibot.Error) as error:
+        except Exception as error:
             print("\nError: %s\n" % error)
         if old_code == self.code:
             return False
