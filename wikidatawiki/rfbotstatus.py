@@ -38,7 +38,7 @@ class RFBOTStatusBot(object):
         rfbot_code = mwparserfromhell.parse(self.rfbot_page.get())
 
         for template in rfbot_code.ifilter_templates():
-            if template.name.lower().strip().startswith(prefix.lower()):
+            if template.name.lower().strip().replace("_", " ").startswith(prefix.lower()):
                 if not ("header" in template.name.lower() or "status" in template.name.lower()):
                     requests.append(template.name.strip().split("/")[-1])
 
