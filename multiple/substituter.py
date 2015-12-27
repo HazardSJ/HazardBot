@@ -57,13 +57,13 @@ class SubstitutionBot(object):
                         temp.add("subst", "subst:")
                 if text != code:
                     pywikibot.showDiff(text, code)
-                    # try:
-                    #     page.put(
-                    #         code,
-                    #         "Bot: Substituting {{%s}}" % template.title(asLink=True, allowInterwiki=False)
-                    #     )
-                    # except pywikibot.Error:
-                    #     continue
+                    try:
+                        page.put(
+                            code,
+                            "Bot: Substituting {{%s}}" % template.title(asLink=True, allowInterwiki=False)
+                        )
+                    except pywikibot.Error:
+                        continue
 
 
 def main():
