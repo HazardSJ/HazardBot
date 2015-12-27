@@ -2,7 +2,8 @@
 
 This as a subset of the scripts created by Hazard-SJ to be used or intended for use by Hazard-Bot on Wikimedia projects.
 
-The scripts are sorted in folders named after the database name of the Wikimedia projects they are related to. Additionally, certain scripts which are related to multiple projects are in the "global" folder.
+The scripts are sorted in folders named after the database name of the Wikimedia projects they are related to.
+Additionally, certain scripts which are related to multiple projects are in the "multiple" folder.
 
 ## Dependencies
 

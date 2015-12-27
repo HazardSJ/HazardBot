@@ -1,0 +1,60 @@
+# -*- coding: utf-8 -*-
+#
+# This work by Hazard-SJ ( https://github.com/HazardSJ ) is licensed under a
+# Creative Commons Attribution-ShareAlike 4.0 International License ( http://creativecommons.org/licenses/by-sa/4.0/ ).
+
+
+from __future__ import unicode_literals
+
+import mwparserfromhell
+import pywikibot
+from pywikibot import pagegenerators
+
+
+class SubstitutionBot(object):
+    """Finds templates that should be substituted and substitutes them as necessary"""
+
+    def __init__(self, site, template):
+        self.site = site
+        self.site.login()
+        self.source_template = template
+
+    def _templates_generator(self):
+        generator = pagegenerators.NamespaceFilterPageGenerator(
+            pagegenerators.ReferringPageGenerator(self.source_template, onlyTemplateInclusion=True),
+            [10]
+        )
+        for page in generator:
+            template = page
+            if template.title().endswith("/doc") and pywikibot.Page(self.site, template.title()[:-4]).exists():
+                template = pywikibot.Page(self.site, template.title()[:-4])
+            if template != self.source_template:
+                yield template
+            for redirect in template.getReferences(redirectsOnly=True, withTemplateInclusion=False):
+                yield redirect
+
+    def run(self):
+        for template in self._templates_generator():
+            title = template.title(withNamespace=False).lower()
+            for page in pagegenerators.ReferringPageGenerator(template, onlyTemplateInclusion=True):
+                try:
+                    text = page.get()
+                except pywikibot.Error:
+                    continue
+                else:
+                    code = mwparserfromhell.parse(text)
+                for temp in code.ifilter_templates():
+                    if temp.has_param("nosubst") or temp.has_param("demo"):
+                        continue
+                    if temp.name.lower().strip() == title:
+                        temp.name = "subst:%s" % template.title()
+                        temp.add("subst", "subst:")
+                if text != code:
+                    pywikibot.showDiff(text, code)
+                    try:
+                        page.put(
+                            code,
+                            "Bot: Substituting {{%s}}" % template.title(asLink=True, allowInterwiki=False)
+                        )
+                    except pywikibot.Error:
+                        continue

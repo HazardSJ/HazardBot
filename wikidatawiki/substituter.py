@@ -9,8 +9,8 @@ from HazardBot.multiple import substituter
 
 
 def main():
-    site = pywikibot.Site("commons", "commons")
-    template = pywikibot.Page(site, "Template:Must be substituted")
+    site = pywikibot.Site("wikidata", "wikidata")
+    template = pywikibot.Page(site, "Template:Subst only")
     bot = substituter.SubstitutionBot(site, template)
     bot.run()
 
