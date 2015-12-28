@@ -42,22 +42,10 @@ class StartDateRemover(object):
             else:
                 return "%(month)s %(day)s, %(year)s" % date
         elif template.has_param(1) and template.has_param(2):
-            if always_use_monthname:
-                return "%(month)s %(year)s" % {
-                    "month": site.expand_text("{{MONTHNAME|%s}}" % template.get(2).strip()),
-                    "year": template.get(1).strip()
-                }
-            else:
-                month = template.get(2).value.strip()
-                try:
-                    if int(month) < 10 and not month.startswith("0"):
-                        month = "0" + month
-                    return "%s %s" % (
-                        template.get(1).value.strip(),
-                        month
-                    )
-                except ValueError:
-                    return None
+            return "%(month)s %(year)s" % {
+                "month": site.expand_text("{{MONTHNAME|%s}}" % template.get(2).strip()),
+                "year": template.get(1).strip()
+            }
         elif template.has_param(1):
             return template.get(1).strip()
         else:
@@ -96,7 +84,12 @@ class StartDateRemover(object):
                                     )
             if text != code:
                 try:
-                    page.put(code, "[[Wikipedia:Bots|Bot]]: Replacing {{[[Template:Start date|start date]]}} with date")
+                    page.put(
+                        code,
+                        "[[Wikipedia:Bots|Bot]]: Replacing {{[[Template:Start date|start date]]}} with the actual date"
+                        " (it should only be used once in a template that emits microformats;"
+                        " see [[Template:Start date/doc]])"
+                    )
                 except pywikibot.Error:
                     continue
 
