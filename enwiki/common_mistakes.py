@@ -53,9 +53,6 @@ class CommonMistakesLister(object):
         for mistake in self.mistakes:
             if " %s " % mistake in page.text and " %s " % mistake in pywikibot.Page(site, page.title).get():
                 self.mistakes[mistake].append(page.title)
-                print(page.title)
-                print(mistake)
-                print("\n")
 
     def list_mistakes(self):
         for mistake in self.mistakes:
