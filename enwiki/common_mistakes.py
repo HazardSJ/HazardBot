@@ -6,6 +6,7 @@
 
 import re
 
+import mwparserfromhell
 import pywikibot
 from pywikibot import xmlreader
 
@@ -19,66 +20,71 @@ class CommonMistakesLister(object):
     """Updates lists of common mistakes for WikiProject Fix common mistakes"""
 
     def __init__(self):
-        blacklist_page = pywikibot.Page(site, "User:Hazard-Bot/Common mistakes blacklist")
-        self.blacklist = re.findall("\[\[(.*?)\]\]", blacklist_page.get())
         self.dump_file = "/public/dumps/public/enwiki/20151201/enwiki-20151201-pages-articles.xml.bz2"
-        self.mistakes = {
-            "a a": list(),
-            "a an": list(),
-            "a the": list(),
-            "an a": list(),
-            "an an": list(),
-            "and and": list(),
-            "are are": list(),
-            "be be": list(),
-            "by by": list(),
-            "for for": list(),
-            "from from": list(),
-            "he he": list(),
-            "in in": list(),
-            "is is": list(),
-            "it it": list(),
-            "of of": list(),
-            "she she": list(),
-            "the the": list(),
-            "this this": list(),
-            "to to": list(),
-            "was was": list(),
-            "were were": list(),
-            "when when": list(),
-            "with with": list(),
-        }
+        # self.mistakes = self.parse_config("Wikipedia:WikiProject Fix common mistakes/Scan configuration")
+        self.mistakes = self.parse_config("User:Hazard-Bot/FIX/Scan configuration")
+        # self.whitelist = self.parse_whitelist("Wikipedia:WikiProject Fix common mistakes/Whitelisted pages")
+        self.whitelist = self.parse_whitelist("User:Hazard-Bot/FIX/Whitelisted pages")
+
+    def parse_config(self, title):
+        mistakes = dict()
+        page = pywikibot.Page(site, title)
+        text = page.get()
+        code = mwparserfromhell.parse(text)
+        sections = code.get_sections(levels=[2])
+        for section in sections:
+            mistake = section.filter_headings()[0].title.strip()
+            if mistake:
+                pattern = r" %s " % mistake
+                for line in section.strip().splitlines():
+                    if line.startswith("*"):
+                        exception = line[1:].strip()
+                        if exception:
+                            pattern = r"(?! %s )%s" % (exception, pattern)
+                mistakes[mistake] = {
+                    "regex": re.compile(pattern),
+                    "pages": list()
+                }
+        return mistakes
+
+    def parse_whitelist(self, title):
+        page = pywikibot.Page(site, title)
+        text = page.get()
+        code = mwparserfromhell.parse(text)
+        return [link.title.lower().strip() for link in code.ifilter_wikilinks()]
 
     def check_page(self, page):
         for mistake in self.mistakes:
-            if " %s " % mistake in page.text:
+            if self.mistakes[mistake]["regex"].search(page.text):
                 try:
                     text = pywikibot.Page(site, page.title).get()
                 except pywikibot.Error:
                     return
                 else:
-                    if " %s " % mistake in text:
-                        self.mistakes[mistake].append(page.title)
+                    if self.mistakes[mistake]["regex"].search(text):
+                        self.mistakes[mistake]["pages"].append(page.title)
 
     def list_mistakes(self):
         for mistake in self.mistakes:
-            if len(self.mistakes[mistake]) > 0:
-                mistake_page = pywikibot.Page(site, "Wikipedia:WikiProject Fix common mistakes/%s" % mistake)
+            page = pywikibot.Page(site, "Wikipedia:WikiProject Fix common mistakes/%s" % mistake)
+            if len(self.mistakes[mistake]["pages"]) > 0:
                 text = "# [["
-                text += "]]\n# [[".join(sorted(self.mistakes[mistake]))
+                text += "]]\n# [[".join(sorted(self.mistakes[mistake]["pages"]))
                 text += "]]"
-                try:
-                    mistake_page.put(
-                        text,
-                        "Bot: Updating the list of common mistakes from the %s dump" % self.dump_file.split("/")[5]
-                    )
-                except pywikibot.Error:
-                    continue
+            else:
+                text = ""
+            try:
+                page.put(
+                    text,
+                    "Bot: Updating the list of common mistakes from the %s dump" % self.dump_file.split("/")[5]
+                )
+            except pywikibot.Error:
+                continue
 
     def run(self):
         dump = xmlreader.XmlDump(self.dump_file)
         for page in dump.parse():
-            if page.ns == "0" and page.title not in self.blacklist:
+            if page.ns == "0" and page.title.lower() not in self.whitelist:
                 self.check_page(page)
         self.list_mistakes()
 
