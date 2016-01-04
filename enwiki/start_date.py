@@ -31,7 +31,7 @@ class StartDateRemover(object):
 
     def _get_date(self, template, always_use_monthname=True):
         """Extracts the date from {{start date}} and returns it in text format"""
-        if template.has_param(1) and template.has_param(2) and template.has_param(3):
+        if template.has_param(1, True) and template.has_param(2, True) and template.has_param(3, True):
             date = {
                 "day": template.get(3).strip().lstrip("0"),
                 "month": site.expand_text("{{MONTHNAME|%s}}" % template.get(2).strip()),
@@ -41,12 +41,12 @@ class StartDateRemover(object):
                 return "%(day)s %(month)s %(year)s" % date
             else:
                 return "%(month)s %(day)s, %(year)s" % date
-        elif template.has_param(1) and template.has_param(2):
+        elif template.has_param(1, True) and template.has_param(2, True):
             return "%(month)s %(year)s" % {
                 "month": site.expand_text("{{MONTHNAME|%s}}" % template.get(2).strip()),
                 "year": template.get(1).strip()
             }
-        elif template.has_param(1):
+        elif template.has_param(1, True):
             return template.get(1).strip()
         else:
             return None
