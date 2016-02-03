@@ -20,7 +20,7 @@ class CommonMistakesLister(object):
     """Updates lists of common mistakes for WikiProject Fix common mistakes"""
 
     def __init__(self):
-        self.dump_file = "/public/dumps/public/enwiki/20151201/enwiki-20151201-pages-articles.xml.bz2"
+        self.dump_file = "/public/dumps/public/enwiki/20160113/enwiki-20160113-pages-articles.xml.bz2"
         # self.mistakes = self.parse_config("Wikipedia:WikiProject Fix common mistakes/Scan configuration")
         self.mistakes = self.parse_config("User:Hazard-Bot/FIX/Scan configuration")
         # self.whitelist = self.parse_whitelist("Wikipedia:WikiProject Fix common mistakes/Whitelisted pages")
