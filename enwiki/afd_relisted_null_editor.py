@@ -15,7 +15,7 @@ class AFDRelistedNullEditor(object):
 
     def process_log(self, log):
         for page in log.itertemplates():
-            if page.title().startswith(self.afd_prefix) and self.category.title() in page.text():
+            if page.title().startswith(self.afd_prefix) and self.category.title() in page.get():
                 try:
                     page.touch()
                 except pywikibot.Error:
