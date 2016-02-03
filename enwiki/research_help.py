@@ -4,6 +4,7 @@
 # Creative Commons Attribution-ShareAlike 4.0 International License ( http://creativecommons.org/licenses/by-sa/4.0/ ).
 
 
+import re
 import mwparserfromhell
 import pywikibot
 
@@ -17,7 +18,7 @@ class ResearchHelpBot(object):
     """Adds {{Research help}} to articles from specific WikiProjects"""
 
     def __init__(self):
-        self.maximum_edits = 100  # Per-run based, will be divided equally among all WikiProjects.
+        self.maximum_edits = 1000  # Per-run based, will be divided equally among all WikiProjects.
         self.groups = {
             "MED": {
                 "template": "{{Research help|Med}}",
@@ -83,6 +84,11 @@ class ResearchHelpBot(object):
                         break
 
                     page = talk.toggleTalkPage()
+
+                    # Skip pages that start with a digit
+                    if re.match(r"\d.*", page.title()):
+                        continue
+
                     try:
                         text = page.get()
                     except pywikibot.Error:
@@ -105,8 +111,9 @@ class ResearchHelpBot(object):
                         continue
 
                     try:
-                        summary = "[[Wikipedia:Bots|Bot]]: Adding %s" % group["template"]
-                        summary += "; please leave feedback/comments at [[Wikipedia talk:Research help]]"
+                        summary = "[[Wikipedia:Bots|Bot]]: Adding %s;" % group["template"]
+                        summary += " please leave feedback/comments at [[Wikipedia talk:Research help]]"
+                        summary += " #ResHelp"
                         page.put(code, summary)
                     except pywikibot.Error:
                         continue
