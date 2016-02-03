@@ -33,11 +33,8 @@ class AFDRelistedCatRemover(object):
             yield page
 
     def remove(self, pattern, text):
-        to_remove = list()
         for cat in self.categories:
-            to_remove += re.findall(pattern % cat.title(), text)
-        for c in set(to_remove):
-                    text = text.replace(c, "")
+            text = re.sub(pattern % cat.title(), "", text)
         return text
 
     def run(self):
@@ -56,8 +53,8 @@ class AFDRelistedCatRemover(object):
                     continue
 
                 old_text = text
-                text = self.remove("<noinclude>\[\[%s(?:\|.*?)?\]\]</noinclude>", text)
-                text = self.remove("\[\[%s(?:\|.*?)?\]\]", text)
+                text = self.remove(r"<noinclude>\[\[%s(?:\|.*?)?\]\]</noinclude>", text)
+                text = self.remove(r"\[\[%s(?:\|.*?)?\]\]", text)
 
                 if old_text == text:
                     continue
