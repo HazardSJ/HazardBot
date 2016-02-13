@@ -21,10 +21,9 @@ class CommonMistakesLister(object):
 
     def __init__(self):
         self.dump_file = "/public/dumps/public/enwiki/20160113/enwiki-20160113-pages-articles.xml.bz2"
-        # self.mistakes = self.parse_config("Wikipedia:WikiProject Fix common mistakes/Scan configuration")
-        self.mistakes = self.parse_config("User:Hazard-Bot/FIX/Scan configuration")
-        # self.whitelist = self.parse_whitelist("Wikipedia:WikiProject Fix common mistakes/Whitelisted pages")
-        self.whitelist = self.parse_whitelist("User:Hazard-Bot/FIX/Whitelisted pages")
+        self.mistakes = self.parse_config("Wikipedia:WikiProject Fix common mistakes/Scan configuration")
+        self.whitelist = self.parse_whitelist("Wikipedia:WikiProject Fix common mistakes/Whitelisted pages")
+        self.filter_tags = ["math", "pre", "score", "source", "syntaxhighlight"]
 
     def parse_config(self, title):
         mistakes = dict()
@@ -53,15 +52,26 @@ class CommonMistakesLister(object):
         code = mwparserfromhell.parse(text)
         return [link.title.lower().strip() for link in code.ifilter_wikilinks()]
 
+    def filter_text(self, text):
+        # Strip the comments
+        text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+        # Strip file names
+        text = re.sub(r"\[\[(?:File|Image):.*?(?:\|(.*?))?\]\]", r"\1", text, flags=re.DOTALL|re.IGNORECASE)
+        # Strip some HTML-style tags
+        for tag in self.filter_tags:
+            text = re.sub(r"<%(tag)s.*?</%(tag)s>" % {"tag": tag}, "", text, flags=re.DOTALL|re.IGNORECASE)
+        # And we're done here
+        return text
+
     def check_page(self, page):
         for mistake in self.mistakes:
-            if self.mistakes[mistake]["regex"].search(page.text):
+            if self.mistakes[mistake]["regex"].search(self.filter_text(page.text)):
                 try:
                     text = pywikibot.Page(site, page.title).get()
                 except pywikibot.Error:
                     return
                 else:
-                    if self.mistakes[mistake]["regex"].search(text):
+                    if self.mistakes[mistake]["regex"].search(self.filter_text(page.text)):
                         self.mistakes[mistake]["pages"].append(page.title)
 
     def list_mistakes(self):
