@@ -24,7 +24,7 @@ class SandBot(object):
             self.do_task_page = pywikibot.Page(self.site, self.config[db_name]["dotask"])
         else:
             self.do_task_page = None
-        self.delay = 5
+        self.delay = 10  # number of minutes sandbox should have not been used for before cleaning
 
     def load_config(self):
         self.config = {
@@ -40,6 +40,7 @@ class SandBot(object):
                 "dotask": "User:Hazard-Bot/DoTask/SandBot",
                 "sandbots": ["Addbot", "AvicBot2", "Cyberbot I", "Hazard-Bot", "Lowercase sigmabot II"],
                 "sandboxes": {
+                    "Draft:Sandbox": "general",
                     "Project:Sandbox": "general",
                     "Project talk:Sandbox": "general",
                     "Project:Tutorial/Citing sources/sandbox": "general",
@@ -183,7 +184,7 @@ class SandBot(object):
         rechecks = 0
         while (len(self.recheck) > 0) and (rechecks > 2):
             rechecks += 1
-            pause = self.delay * 60
+            pause = 3 * 60
             print("Pausing %i seconds to recheck %i sandboxes %s" % (pause, len(self.recheck), tuple(self.recheck)))
             sleep(pause)
             clean_sandboxes(self.recheck)
