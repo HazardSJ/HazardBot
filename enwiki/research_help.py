@@ -62,19 +62,6 @@ class ResearchHelpBot(object):
                         return section
         return None
 
-    def insert_rh_template(self, rh_template, section):
-        rh_template += "\n"
-        # Insert before <references />
-        if "<references" in section:
-            section.replace("<references", "%s<references" % rh_template)
-            return
-        # Insert before {{reflist}}
-        for template in section.ifilter_templates():
-            if template.name.lower().strip() in self._reflist_template_titles:
-                if not template.has_param("group"):
-                    section.insert_before(template, rh_template)
-                    return
-
     def run(self):
         for group in self.groups.values():
             edits = 0
@@ -86,7 +73,10 @@ class ResearchHelpBot(object):
                     page = talk.toggleTalkPage()
 
                     # Skip pages that start with a digit
-                    if re.match(r"\d.*", page.title()):
+                    if re.match(r"\d", page.title()):
+                        continue
+                    # Skip pages that start with the letter "A" or "B" (so we don't do any more of those)
+                    if re.match(r"[A-B]", page.title()):
                         continue
 
                     try:
@@ -103,7 +93,11 @@ class ResearchHelpBot(object):
                     section = self.get_best_section(code)
 
                     if section is not None:
-                        self.insert_rh_template(group["template"], section)
+                        try:
+                            section_heading = section.filter_headings()[0]
+                        except IndexError:
+                            continue
+                        section.insert_after(section_heading, "\n" + group["template"])
                     else:
                         continue
 
