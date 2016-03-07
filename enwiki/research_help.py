@@ -76,7 +76,7 @@ class ResearchHelpBot(object):
                     if re.match(r"\d", page.title()):
                         continue
                     # Skip pages that start with the letter "A" or "B" (so we don't do any more of those)
-                    if re.match(r"[A-B]", page.title()):
+                    if re.match(r"[A-C]", page.title()):
                         continue
 
                     try:
