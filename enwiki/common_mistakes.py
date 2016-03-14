@@ -56,7 +56,8 @@ class CommonMistakesLister(object):
         # Strip the comments
         text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
         # Strip file names
-        text = re.sub(r"\[\[(?:File|Image):.*?(?:\|(.*?))?\]\]", r"\1", text, flags=re.DOTALL|re.IGNORECASE)
+        text = re.sub(r"\[\[(?:File|Image):.*?(?:\|(.*?))?\]\]", lambda m: m.group(1) or "",
+                      text, flags=re.DOTALL|re.IGNORECASE)
         # Strip some HTML-style tags
         for tag in self.filter_tags:
             text = re.sub(r"<%(tag)s.*?</%(tag)s>" % {"tag": tag}, "", text, flags=re.DOTALL|re.IGNORECASE)
