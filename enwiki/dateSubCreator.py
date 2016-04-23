@@ -61,13 +61,13 @@ class SubCreatorBot(object):
 {{subst:Orphaned non-free use subcat starter|%(year)s|%(monthname)s||%(day)s}}
 """
             },
-            "possiblyunfree": {
-                "title":
-                    "Category:Possibly unfree files from %(year)s %(monthname)s %(day)s",
-                "text": """\
-{{subst:Possibly unfree files subcategory starter|%(year)s|%(monthname)s||%(day)s|MONTHNO=%(month2)s}}
-"""
-            },
+#             "possiblyunfree": {
+#                 "title":
+#                     "Category:Possibly unfree files from %(year)s %(monthname)s %(day)s",
+#                 "text": """\
+# {{subst:Possibly unfree files subcategory starter|%(year)s|%(monthname)s||%(day)s|MONTHNO=%(month2)s}}
+# """
+#             },
             "prod": {
                 "title":
                     "Category:Proposed deletion as of %(day)s %(monthname)s %(year)s",
