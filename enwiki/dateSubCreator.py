@@ -113,13 +113,6 @@ class SubCreatorBot(object):
 """
                 ]
             },
-            "uploadassistance": {
-                "title":
-                    "Category:Wikipedia files needing editor assistance at upload as of %(day)s %(monthname)s %(year)s",
-                "text": """\
-{{subst:Wikipedia files needing editor assistance at upload subcategory starter|%(year)s|%(monthname)s||%(day)s}}
-"""
-            },
         }
 
     def getDate(self):
