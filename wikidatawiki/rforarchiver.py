@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-#
-# This work by Hazard-SJ ( https://github.com/HazardSJ ) is licensed under a
-# Creative Commons Attribution-ShareAlike 4.0 International License ( http://creativecommons.org/licenses/by-sa/4.0/ ).
-
-
 from datetime import datetime
 import re
+
 import mwparserfromhell
 import pywikibot
 

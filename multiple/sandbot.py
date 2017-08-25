@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
-#
-# This work by Hazard-SJ ( https://github.com/HazardSJ ) is licensed under a
-# Creative Commons Attribution-ShareAlike 4.0 International License ( http://creativecommons.org/licenses/by-sa/4.0/ ).
-
-
-import sys
-from re import findall
 from datetime import datetime
+from re import findall
+import sys
 from time import sleep
 
 import pywikibot

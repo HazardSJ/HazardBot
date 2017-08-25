@@ -1,5 +1,6 @@
 import pywikibot
 
+
 pywikibot.config.family = "wikipedia"
 pywikibot.config.mylang = "en"
 site = pywikibot.Site()

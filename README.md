@@ -12,4 +12,4 @@ Additionally, certain scripts which are related to multiple projects are in the 
 
 ## License
 
-Unless otherwise stated, HazardBot by [Hazard-SJ](https://github.com/HazardSJ) is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
+Unless otherwise stated, HazardBot by [Hazard-SJ](https://github.com/HazardSJ) is licensed under the [MIT License](LICENSE).
