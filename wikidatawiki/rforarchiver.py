@@ -42,7 +42,7 @@ class RFORArchiverBot(object):
             else:
                 continue
             archivable = list()
-            for discussion in section.get_sections(levels=[4]):
+            for discussion in section.get_sections(levels=[3]):
                 templates = [template.name.lower().strip() for template in discussion.ifilter_templates()]
                 if not ("done" in templates or "not done" in templates or "notdone" in templates):
                     continue
