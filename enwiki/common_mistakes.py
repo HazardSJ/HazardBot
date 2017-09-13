@@ -15,7 +15,7 @@ class CommonMistakesLister(object):
     """Updates lists of common mistakes for WikiProject Fix common mistakes"""
 
     def __init__(self):
-        self.dump_file = "/public/dumps/public/enwiki/{date}/enwiki-{date}-pages-articles.xml.bz2".format(date="20170801")
+        self.dump_file = "/public/dumps/public/enwiki/{date}/enwiki-{date}-pages-articles.xml.bz2".format(date="20170901")
         self.mistakes = self.parse_config("Wikipedia:WikiProject Fix common mistakes/Scan configuration")
         self.whitelist = self.parse_whitelist("Wikipedia:WikiProject Fix common mistakes/Whitelisted pages")
         self.filter_tags = ["math", "pre", "score", "source", "syntaxhighlight"]
