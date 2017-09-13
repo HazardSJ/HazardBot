@@ -23,7 +23,7 @@ site.login()
 
 class InternationalizationBot(object):
     def __init__(self):
-        self.dump_file = "/public/dumps/public/commonswiki/{date}/commonswiki-{date}-pages-articles.xml.bz2".format(date="20170801")
+        self.dump_file = "/public/dumps/public/commonswiki/{date}/commonswiki-{date}-pages-articles.xml.bz2".format(date="20170820")
         self.load_file_translations()
 
     def load_file_translations(self):
