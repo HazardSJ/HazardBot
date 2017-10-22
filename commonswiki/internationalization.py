@@ -34,7 +34,7 @@ class InternationalizationBot(object):
         
     def get_dump_file(self):
         wiki_folder = os.sep + os.path.join("public", "dumps", "public", "commonswiki")
-        dumps_dates = sorted(os.listdir(wiki_folder), reverse=True)
+        dump_dates = sorted(os.listdir(wiki_folder), reverse=True)
         for date in dump_dates:
             status_path = os.path.join(wiki_folder, date, "status.html")
             with open(status_path) as status_file:
