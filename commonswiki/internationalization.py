@@ -5,6 +5,7 @@
 
 
 from __future__ import unicode_literals
+import os
 import re
 
 import mwparserfromhell
@@ -22,9 +23,23 @@ site.login()
 
 
 class InternationalizationBot(object):
+    
+    DUMP_PATH_FORMAT = "/public/dumps/public/commonswiki/{date}/commonswiki-{date}-pages-articles.xml.bz2"
+    
     def __init__(self):
-        self.dump_file = "/public/dumps/public/commonswiki/{date}/commonswiki-{date}-pages-articles.xml.bz2".format(date="20170820")
+        self.dump_file = self.get_dump_file()
+        if self.dump_file is None:
+            raise RuntimeError("The dump file could not be determined.")
         self.load_file_translations()
+        
+    def get_dump_file(self):
+        wiki_folder = os.sep + os.path.join("public", "dumps", "public", "commonswiki")
+        dumps_dates = sorted(os.listdir(wiki_folder), reverse=True)
+        for date in dump_dates:
+            status_path = os.path.join(wiki_folder, date, "status.html")
+            with open(status_path) as status_file:
+                if "Dump complete" in status_file.read():
+                    return self.DUMP_PATH_FORMAT.format(date=date)
 
     def load_file_translations(self):
         print("Loading translations of the 'File' namespace ...")
