@@ -19,10 +19,10 @@ class RFORArchiverBot(object):
         self.base_page = pywikibot.Page(site, "Wikidata:Requests for permissions")
         self.requests_page = pywikibot.Page(site, self.base_page.title() + "/Other rights")
         self.archive_titles = {
-            "confirmed": self.base_page.title() + "/RfConfirmed/%s",
-            # "ipblock-exempt": self.basePage.title() + "",  # Not archived currently
-            "propertycreator": self.base_page.title() + "/RfPropertyCreator/%s",
-            "rollbacker": self.base_page.title() + "/RfRollback/%s"
+            "confirmed": self.base_page.title() + "/RfConfirmed/%B %Y",
+            "ipblock-exempt": self.basePage.title() + "/RfIPBE/%Y",  # archived by the year
+            "propertycreator": self.base_page.title() + "/RfPropertyCreator/%B %Y",
+            "rollbacker": self.base_page.title() + "/RfRollback/%B %Y"
         }
         self.closed_regex = "\n\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?top\|.*?\}\}.*?"
         self.closed_regex += "\{\{\s*(?:A(?:rchive)?|D(?:iscussion)?) ?bottom\}\}\n"
@@ -33,24 +33,27 @@ class RFORArchiverBot(object):
         text = self.requests_page.get()
         code = mwparserfromhell.parser.Parser().parse(text, skip_style_tags=True)
         for section in code.get_sections(levels=[2]):
-            if "confirmed" in section.filter_headings()[0].title.lower():
+            heading = section.filter_headings()[0].title.lower()
+            if "confirmed" in heading:
                 group = "confirmed"
-            elif "property" in section.filter_headings()[0].title.lower():
+            elif "ipbe" in heading:
+                group = "ipblock-exempt"
+            elif "property" in heading:
                 group = "propertycreator"
-            elif "rollback" in section.filter_headings()[0].title.lower():
+            elif "rollback" in heading:
                 group = "rollbacker"
             else:
                 continue
-            archivable = list()
+            archivable = []
             for discussion in section.get_sections(levels=[3]):
                 templates = [template.name.lower().strip() for template in discussion.ifilter_templates()]
                 if not ("done" in templates or "not done" in templates or "notdone" in templates):
                     continue
                 timestamps = re.findall(
-                    "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", discussion.__unicode__()
+                    "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", unicode(discussion)
                 )
                 timestamps = sorted(
-                    [datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y") for timestamp in timestamps]
+                    datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y") for timestamp in timestamps
                 )
                 if (datetime.utcnow() - timestamps[-1]).days >= 5:
                     archivable.append(discussion)
@@ -58,7 +61,7 @@ class RFORArchiverBot(object):
                 continue
             archive = pywikibot.Page(
                 site,
-                self.archive_titles[group] % datetime.utcnow().strftime("%B %Y")
+                datetime.utcnow().strftime(self.archive_titles[group])
             )
             if archive.exists():
                 archive_text = archive.get()
@@ -84,6 +87,7 @@ class RFORArchiverBot(object):
 def main():
     bot = RFORArchiverBot()
     bot.run()
+
 
 if __name__ == "__main__":
     try:
