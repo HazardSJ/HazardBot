@@ -20,7 +20,7 @@ class RFORArchiverBot(object):
         self.requests_page = pywikibot.Page(site, self.base_page.title() + "/Other rights")
         self.archive_titles = {
             "confirmed": self.base_page.title() + "/RfConfirmed/%B %Y",
-            "ipblock-exempt": self.basePage.title() + "/RfIPBE/%Y",  # archived by the year
+            "ipblock-exempt": self.base_page.title() + "/RfIPBE/%Y",  # archived by the year
             "propertycreator": self.base_page.title() + "/RfPropertyCreator/%B %Y",
             "rollbacker": self.base_page.title() + "/RfRollback/%B %Y"
         }
