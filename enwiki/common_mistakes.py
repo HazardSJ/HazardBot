@@ -84,7 +84,7 @@ class CommonMistakesLister(object):
             try:
                 page.put(
                     text,
-                    "Bot: Updating the list of common mistakes from the %s dump" % self.dump_file.split("/")[5]
+                    "Bot: Updating the list of common mistakes from the latest dump"
                 )
             except pywikibot.Error:
                 continue
