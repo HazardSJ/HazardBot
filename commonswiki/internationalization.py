@@ -24,26 +24,14 @@ site.login()
 
 class InternationalizationBot(object):
     
-    DUMP_PATH_FORMAT = "/public/dumps/public/commonswiki/{date}/commonswiki-{date}-pages-articles.xml.bz2"
+    DUMP_FILE = "/public/dumps/public/commonswiki/latest/commonswiki-latest-pages-articles.xml.bz2"
     
     def __init__(self):
-        self.dump_file = self.get_dump_file()
-        if self.dump_file is None:
-            raise RuntimeError("The dump file could not be determined.")
         self.load_file_translations()
-        
-    def get_dump_file(self):
-        wiki_folder = os.sep + os.path.join("public", "dumps", "public", "commonswiki")
-        dump_dates = sorted(os.listdir(wiki_folder), reverse=True)
-        for date in dump_dates:
-            status_path = os.path.join(wiki_folder, date, "status.html")
-            with open(status_path) as status_file:
-                if "Dump complete" in status_file.read():
-                    return self.DUMP_PATH_FORMAT.format(date=date)
 
     def load_file_translations(self):
         print("Loading translations of the 'File' namespace ...")
-        self.file_translations = list()
+        self.file_translations = []
         for lang in pywikibot.Site("en", "wikipedia").family.langs:
             self.file_translations.append(
                 pywikibot.Site(lang, "wikipedia").namespace(6).lower()
@@ -131,7 +119,7 @@ class InternationalizationBot(object):
             return True
 
     def generator(self):
-        dump = xmlreader.XmlDump(self.dump_file)
+        dump = xmlreader.XmlDump(self.DUMP_FILE)
         gen = dump.parse()
         for page in gen:
             if page.isredirect:
