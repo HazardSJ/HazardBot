@@ -70,12 +70,18 @@ def main():
 
     todays_date = datetime.strftime(datetime.utcnow(), "%B %d")
 
-    remove_empty_sections(text, todays_date)
-    add_todays_section(text, todays_date)
+    summary = []
+
+    removed_count = remove_empty_sections(text, todays_date)
+    if removed_count:
+        summary.append("removed %d empty sections" % removed_count)
+
+    if add_todays_section(text, todays_date):
+        summary.append("added daily section heading for %s" % todays_date)
 
     page.text = text
     page.save(
-        summary="[[Commons:Bots|Bot]]: updating daily section headings",
+        summary="[[Commons:Bots|Bot]]: %s" % "; ".join(summary),
     )
 
 
