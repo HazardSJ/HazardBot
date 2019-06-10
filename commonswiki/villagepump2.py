@@ -74,7 +74,11 @@ def main():
 
     removed_count = remove_empty_sections(text, todays_date)
     if removed_count:
-        summary.append("removed %d empty sections" % removed_count)
+        summary.append(
+            "removed an empty section"
+            if removed_count == 1 else
+            "removed %d empty sections" % removed_count
+        )
 
     if add_todays_section(text, todays_date):
         summary.append("added daily section heading for %s" % todays_date)
