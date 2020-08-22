@@ -15,26 +15,32 @@ site = pywikibot.Site()
 site.login()
 
 
-class RFDArchiverBot(object):
+class RFDArchiverBot:
+
     def __init__(self):
         self.time_diff = float(0.5 * (60 * 60))
         self.current_time = time.gmtime()
         self.current_timestamp = time.mktime(self.current_time)
         rfd_title = "Wikidata:Requests for deletions"
-        archive_title = "%s/Archive/%s" % (rfd_title, time.strftime("%Y/%m/%d", self.current_time))
+        archive_title = "%s/Archive/%s" % (
+            rfd_title, time.strftime("%Y/%m/%d", self.current_time))
         self.rfd_page = pywikibot.Page(site, rfd_title)
         self.archive_page = pywikibot.Page(site, archive_title)
         self.archive_header = "{{Archive|category=Archived requests for deletion}}"
-        self.response_templates = ["done", "deleted", "not done", "not deleted", "didn't delete"]
+        self.response_templates = {
+            "done", "deleted", "not done", "not deleted", "didn't delete"
+        }
+        for template in self.response_templates.copy():
+            self.response_templates |= set(template_redirects(template))
         self.archive_count = 0
 
-    def processRequests(self):
+    def process_requests(self):
         sections = self.rfd_code.get_sections(levels=[2])
         for section in sections:
             responded = False
             templates = [template.name.lower().strip() for template in section.ifilter_templates()]
-            for responseTemplate in self.response_templates:
-                if responseTemplate in templates:
+            for response_template in self.response_templates:
+                if response_template in templates:
                     responded = True
                     break
             if not responded:
@@ -90,7 +96,7 @@ class RFDArchiverBot(object):
             archive_text = self.archive_header
         self.rfd_code = mwparserfromhell.parser.Parser().parse(rfd_text, skip_style_tags=True)
         self.archive_code = mwparserfromhell.parser.Parser().parse(archive_text + "\n\n", skip_style_tags=True)
-        self.processRequests()
+        self.process_requests()
         if not self.archive_count:
             pywikibot.output("There are no archivable requests.")
             return
@@ -98,9 +104,18 @@ class RFDArchiverBot(object):
         self.archive_page.put(self.archive_code, comment=self.get_summary(is_archive=True))
 
 
+def template_redirects(template_title):
+    template_ns = 10
+    template = pywikibot.Page(site, template_title, template_ns)
+    redirects = template.backlinks(filter_redirects=True)
+    # TODO: Verify that redirects are from the template namespace.
+    return (redirect.title(with_ns=False).lower() for redirect in redirects)
+
+
 def main():
     bot = RFDArchiverBot()
     bot.run()
+
 
 if __name__ == "__main__":
     try:
