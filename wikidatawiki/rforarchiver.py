@@ -12,7 +12,7 @@ site = pywikibot.Site()
 site.login()
 
 
-class RFORArchiverBot(object):
+class RFORArchiverBot:
     """Archives closed requests on [[Wikidata:Requests for permissions/Other rights]]"""
 
     def __init__(self):
@@ -50,14 +50,14 @@ class RFORArchiverBot(object):
                 if not ("done" in templates or "not done" in templates or "notdone" in templates):
                     continue
                 timestamps = re.findall(
-                    "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", unicode(discussion)
+                    "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", str(discussion)
                 )
                 timestamps = sorted(
                     datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y") for timestamp in timestamps
                 )
                 if (datetime.utcnow() - timestamps[-1]).days >= 5:
                     archivable.append(discussion)
-            if not archivable:
+            if len(archivable) == 0:
                 continue
             archive = pywikibot.Page(
                 site,
