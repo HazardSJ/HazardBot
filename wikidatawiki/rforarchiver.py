@@ -63,16 +63,12 @@ class RFORArchiverBot:
                 site,
                 datetime.utcnow().strftime(self.archive_titles[group])
             )
-            if archive.exists():
-                archive_text = archive.get()
-            else:
-                archive_text = self.archive_text
-                archive_text += "\n\n"
+            archive_text = archive.get() if archive.exists() else self.archive_text
             archive_code = mwparserfromhell.parse(archive_text)
             for add in archivable:
                 append = add.strip()
                 if append not in archive_code:
-                    archive_code.append(append + "\n\n")
+                    archive_code.append("\n\n" + append)
             for remove in archivable:
                 code.remove(remove)
             archive.put(
