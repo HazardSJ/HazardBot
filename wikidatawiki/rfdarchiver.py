@@ -70,16 +70,13 @@ class RFDArchiverBot:
             return summary
 
         revision = self.rfd_page.latest_revision
-        summary += " (last edit at %s by [[User:%s|]]" % (
-            revision.timestamp,
-            revision.user,
-        )
+        summary += "; last edit was by [[User:%s|]]" % revision.user
         user_groups = pywikibot.page.User(site, revision.user).groups()
         if "sysop" in user_groups and "bot" not in user_groups:
             summary += " (administrator)"
+        summary += " at %s" % revision.timestamp
         if revision.comment:
             summary += ": '%s'" % revision.comment
-        summary += ")"
         return summary
 
     def run(self):
