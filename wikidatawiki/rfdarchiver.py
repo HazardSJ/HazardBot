@@ -1,11 +1,8 @@
-from __future__ import unicode_literals
-
 import re
 import time
 
 import mwparserfromhell
 import pywikibot
-from pywikibot.data.api import Request
 
 
 pywikibot.config.family = "wikidata"
@@ -18,7 +15,7 @@ site.login()
 class RFDArchiverBot:
 
     def __init__(self):
-        self.time_diff = float(0.5 * (60 * 60))
+        self.time_diff = 0.5 * (60 * 60)
         self.current_time = time.gmtime()
         self.current_timestamp = time.mktime(self.current_time)
         rfd_title = "Wikidata:Requests for deletions"
@@ -71,21 +68,18 @@ class RFDArchiverBot:
         )
         if is_archive:
             return summary
-        version = self.rfd_page.getVersionHistory(total=1)[0]
-        user = version[2]
-        params = {
-            "action": "query",
-            "list": "users",
-            "ususers": user,
-            "usprop": "groups"
-        }
-        user_groups = Request(**params).submit()["query"]["users"][0]["groups"]
-        summary += " (last edit at %s by [[User:%s|]]%s%s" % (
-            version[1],
-            user,
-            " (administrator)" if (not ("bot" in user_groups) and ("sysop" in user_groups)) else "",
-            ": '%s'" % version[3] if version[3] else ""
+
+        revision = self.rfd_page.latest_revision
+        summary += " (last edit at %s by [[User:%s|]]" % (
+            revision.timestamp,
+            revision.user,
         )
+        user_groups = pywikibot.page.User(revision.user).groups()
+        if "sysop" in user_groups and "bot" not in user_groups:
+            summary += " (administrator)"
+        if revision.comment:
+            summary += ": '%s'" % revision.comment
+        summary += ")"
         return summary
 
     def run(self):
