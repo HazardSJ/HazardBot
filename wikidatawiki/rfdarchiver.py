@@ -74,7 +74,7 @@ class RFDArchiverBot:
             revision.timestamp,
             revision.user,
         )
-        user_groups = pywikibot.page.User(revision.user).groups()
+        user_groups = pywikibot.page.User(site, revision.user).groups()
         if "sysop" in user_groups and "bot" not in user_groups:
             summary += " (administrator)"
         if revision.comment:
