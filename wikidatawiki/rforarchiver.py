@@ -15,6 +15,8 @@ site.login()
 class RFORArchiverBot:
     """Archives closed requests on [[Wikidata:Requests for permissions/Other rights]]"""
 
+    RESOLUTION_TEMPLATES = {"done", "not done", "notdone", "withdrawn"}
+
     def __init__(self):
         self.base_page = pywikibot.Page(site, "Wikidata:Requests for permissions")
         self.requests_page = pywikibot.Page(site, self.base_page.title() + "/Other rights")
@@ -46,14 +48,18 @@ class RFORArchiverBot:
                 continue
             archivable = []
             for discussion in section.get_sections(levels=[3]):
-                templates = [template.name.lower().strip() for template in discussion.ifilter_templates()]
-                if not ("done" in templates or "not done" in templates or "notdone" in templates):
-                    continue
+                for template in discussion.ifilter_templates():
+                    if template.name.lower().strip() in self.RESOLUTION_TEMPLATES:
+                        break  # Start processing this section.
+                else:
+                    continue  # Skip to next section.
+                
                 timestamps = re.findall(
                     "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", str(discussion)
                 )
                 timestamps = sorted(
-                    datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y") for timestamp in timestamps
+                    datetime.strptime(timestamp[:-6], "%H:%M, %d %B %Y")
+                    for timestamp in timestamps
                 )
                 if (datetime.utcnow() - timestamps[-1]).days >= 5:
                     archivable.append(discussion)
