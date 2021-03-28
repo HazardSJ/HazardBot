@@ -12,7 +12,7 @@ class SandBot(object):
         self.db_name = db_name
         self.site = self.config[db_name]["site"]
         self.site.login()
-        self.edit_summary = pywikibot.i18n.twtranslate(self.site.language(), "clean_sandbox-cleaned")
+        self.edit_summary = pywikibot.i18n.twtranslate(self.site, "clean_sandbox-cleaned")
         self.sandbots = self.config[db_name]["sandbots"]
         if self.config[db_name]["dotask"]:
             self.do_task_page = pywikibot.Page(self.site, self.config[db_name]["dotask"])
