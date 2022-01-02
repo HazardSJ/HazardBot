@@ -79,7 +79,7 @@ class RFORArchiverBot:
                 code.remove(remove)
             archive.put(
                 archive_code,
-                "[[Wikidata:Bots|Bot]]: Archiving from %s" % self.requests_page.title(asLink=True)
+                "[[Wikidata:Bots|Bot]]: Archiving from %s" % self.requests_page.title(as_link=True)
             )
         pywikibot.showDiff(text, code)
         if text != code:
