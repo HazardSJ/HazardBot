@@ -43,7 +43,7 @@ class RFDArchiverBot:
             if not responded:
                 continue
             timestamps = re.findall(
-                "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", section.__unicode__(), re.DOTALL
+                "\d{1,2}:\d{2},\s\d{1,2}\s\D{3,9}\s\d{4}\s\(UTC\)", str(section), re.DOTALL
             )
             timestamps = sorted(
                 [time.mktime(time.strptime(timestamp[:-6], "%H:%M, %d %B %Y")) for timestamp in timestamps]
