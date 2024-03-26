@@ -12,7 +12,9 @@ class SandBot(object):
         self.db_name = db_name
         self.site = self.config[db_name]["site"]
         self.site.login()
-        self.edit_summary = pywikibot.i18n.twtranslate(self.site, "clean_sandbox-cleaned")
+        # TODO: Figure out why this isn't workng on Toolforge k8s, or remove it.
+        # self.edit_summary = pywikibot.i18n.twtranslate(self.site, "clean_sandbox-cleaned")
+        self.edit_summary = self.config[db_name]["edit_summary"]
         self.sandbots = self.config[db_name]["sandbots"]
         if self.config[db_name]["dotask"]:
             self.do_task_page = pywikibot.Page(self.site, self.config[db_name]["dotask"])
@@ -25,13 +27,15 @@ class SandBot(object):
             "commonswiki": {
                 "site": pywikibot.Site("commons", "commons"),
                 "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Bot: Automatically cleaned",
                 "sandbots": ["Hazard-Bot", "O (bot)"],
                 "sandboxes": {"Project:Sandbox": "general"},
-                "groups": {"general": "{{Sandbox}}\n<!-- Please edit only below this line. -->"}
+                "groups": {"general": "{{Sandbox}}\n<!-- Please edit only below this line. -->"},
             },
             "enwiki": {
                 "site": pywikibot.Site("en", "wikipedia"),
                 "dotask": "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Bot: Automatically cleaned",
                 "sandbots": ["Addbot", "AvicBot2", "Cyberbot I", "Hazard-Bot", "Lowercase sigmabot II"],
                 "sandboxes": {
                     "Draft:Sandbox": "general",
@@ -77,11 +81,12 @@ class SandBot(object):
                 "groups": {
                     "general": "{{subst:Sandbox reset}}",
                     "template": "{{subst:Template sandbox reset}}"
-                }
+                },
             },
             "mediawikiwiki": {
                 "site": pywikibot.Site("mediawiki", "mediawiki"),
                 "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Bot: Automatically cleaned",
                 "sandbots": ["Hazard-Bot"],
                 "sandboxes": {
                     "Project:Sandbox": "general",
@@ -90,11 +95,12 @@ class SandBot(object):
                 "groups": {
                     "general": "{{Please leave this line alone and write below (this is the coloured heading)}}",
                     "visualeditor": "{{subst:Project:VisualEditor testing/Test/Text}}"
-                }
+                },
             },
             "nlwiki": {
                 "site": pywikibot.Site("nl", "wikipedia"),
                 "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Robot: automatisch opgeruimd",
                 "sandbots": ["Hazard-Bot"],
                 "sandboxes": {
                     "Project:Snelcursus/Probeer maar...": "tutorial",
@@ -103,11 +109,12 @@ class SandBot(object):
                 "groups": {
                     "tutorial": "{{subst:/origineel}}",
                     "general": "{{subst:/origineel}}",
-                }
+                },
             },
             "simplewiki": {
                 "site": pywikibot.Site("simple", "wikipedia"),
                 "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Bot: Automatically cleaned",
                 "sandbots": ["Hazard-Bot", "RileyBot"],
                 "sandboxes": {
                     "Project:Sandbox": "general",
@@ -121,8 +128,8 @@ class SandBot(object):
 """,
                     "tutorial": """{{Wikipedia:Student tutorial/Nav bar}}
 {{Please try your changes below this line}}"""
-                }
-            }
+                },
+            },
         }
 
     def check_do_task_page(self):
