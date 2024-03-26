@@ -204,9 +204,9 @@ class SandHeaderBot(SandBot):
 
     def _get_titles(self, template):
         """Gets a list of the lowercase titles of a template and its redirects"""
-        titles = [template.title(withNamespace=False).lower()]
-        for reference in template.getReferences(withTemplateInclusion=False, redirectsOnly=True):
-            titles.append(reference.title(withNamespace=False).lower())
+        titles = [template.title(with_ns=False).lower()]
+        for reference in template.getReferences(with_template_inclusion=False, filter_redirects=True):
+            titles.append(reference.title(with_ns=False).lower())
         return list(set(titles))
 
     def run(self):
