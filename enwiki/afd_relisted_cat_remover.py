@@ -35,11 +35,11 @@ class AFDRelistedCatRemover(object):
 
     def run(self):
         for category in self.categories:
-            pywikibot.output(category.title(asLink=True) + "\n")
+            pywikibot.output(category.title(as_link=True) + "\n")
 
             for page in self.page_generator(category):
                 try:
-                    pywikibot.output(page.title(asLink=True))
+                    pywikibot.output(page.title(as_link=True))
                 except UnicodeEncodeError:
                     pass
 
@@ -56,7 +56,7 @@ class AFDRelistedCatRemover(object):
                     continue
 
                 try:
-                    page.put(text, "[[Wikipedia:Bots|Bot]]: Removing closed AfD from %s" % category.title(asLink=True))
+                    page.put(text, "[[Wikipedia:Bots|Bot]]: Removing closed AfD from %s" % category.title(as_link=True))
                 except pywikibot.Error:
                     pywikibot.output("Could not remove the category from %s" % page.title())
             pywikibot.output("\n")
