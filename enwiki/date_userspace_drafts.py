@@ -1,5 +1,6 @@
 import mwparserfromhell
 import pywikibot
+import pywikibot.exceptions
 
 
 pywikibot.config.family = "wikipedia"
@@ -18,9 +19,9 @@ class UserspaceDraftDater(object):
 
     def _get_titles(self, template):
         """Gets a list of the lowercase titles of a template and its redirects"""
-        titles = [template.title(withNamespace=False).lower()]
-        for reference in template.getReferences(withTemplateInclusion=False, redirectsOnly=True):
-            titles.append(reference.title(withNamespace=False).lower())
+        titles = [template.title(with_ns=False).lower()]
+        for reference in template.getReferences(with_template_inclusion=False, filter_redirects=True):
+            titles.append(reference.title(with_ns=False).lower())
         return list(set(titles))
 
     def ensure_category(self, title):
@@ -31,19 +32,19 @@ class UserspaceDraftDater(object):
                 category.put(
                         "{{Monthly clean-up category}}",
                         "[[Wikipedia:Bots|Bot]]: Creating monthly clean-up category for %s" %
-                            self.template.title(asLink=True)
+                            self.template.title(as_link=True)
                 )
 
     def run(self):
         for page in self.category.articles(namespaces=2):
             try:
-                pywikibot.output(page.title(asLink=True))
+                pywikibot.output(page.title(as_link=True))
             except UnicodeEncodeError:
                 pass
 
             try:
                 text = page.get()
-            except pywikibot.Error:
+            except pywikibot.exceptions.Error:
                 continue
             else:
                 code = mwparserfromhell.parse(text)
@@ -57,9 +58,9 @@ class UserspaceDraftDater(object):
 
             if text != code:
                 try:
-                    page.put(code, "[[Wikipedia:Bots|Bot]]: Adding date to %s" % self.template.title(asLink=True))
+                    page.put(code, "[[Wikipedia:Bots|Bot]]: Adding date to %s" % self.template.title(as_link=True))
                     self.ensure_category("Category:Userspace drafts from %s" % date)
-                except pywikibot.Error:
+                except pywikibot.exceptions.Error:
                     continue
 
 
