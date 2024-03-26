@@ -64,7 +64,7 @@ class RFDArchiverBot:
             self.archive_count,
             "" if self.archive_count == 1 else "s",
             "from" if is_archive else "to",
-            self.rfd_page.title(asLink=True) if is_archive else self.archive_page.title(asLink=True)
+            self.rfd_page.title(as_link=True) if is_archive else self.archive_page.title(as_link=True)
         )
         if is_archive:
             return summary
@@ -91,8 +91,8 @@ class RFDArchiverBot:
         if not self.archive_count:
             pywikibot.output("There are no archivable requests.")
             return
-        self.rfd_page.put(self.rfd_code, comment=self.get_summary())
-        self.archive_page.put(self.archive_code, comment=self.get_summary(is_archive=True))
+        self.rfd_page.put(self.rfd_code, summary=self.get_summary())
+        self.archive_page.put(self.archive_code, summary=self.get_summary(is_archive=True))
 
 
 def template_redirects(template_title):
