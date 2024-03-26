@@ -130,6 +130,24 @@ class SandBot(object):
 {{Please try your changes below this line}}"""
                 },
             },
+            "sqwiki": {
+                "site": pywikibot.Site("sq", "wikipedia"),
+                "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
+                "edit_summary": "Roboti: Pastrim automatik",
+                "sandbots": ["Hazard-Bot"],
+                "sandboxes": {
+                    "Project:Livadhi": "general",
+                },
+                "groups": {
+                    "general": """{{Livadhi}}<!--
+*      Mirë se erdhët në Livadhin e Wikipedia-s!   *
+*          Ju lutemi, mos e fshini këtë pjesë.    *
+*        Kjo faqe pastrohet rregullisht.          *
+*   Provoni aftësitë tuaja të redaktimit poshtë.  *
+■■■■ ■■■■■ ■■■■■■■■■■■■■■■■■■■■■■■ ■■■■ ■■■■■■■■ ■■■■■ ■■■■■-->
+""",
+                },
+            },
         }
 
     def check_do_task_page(self):
