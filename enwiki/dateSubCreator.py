@@ -165,7 +165,7 @@ class SubCreatorBot(object):
                     )
                 else:
                     self.submit(self.subs[sub]["text"] % self.date)
-            except (Exception, pywikibot.Error), error:
+            except (Exception, pywikibot.Error) as error:
                 pywikibot.output(error)
                 continue
 
