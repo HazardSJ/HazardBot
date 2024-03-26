@@ -4,7 +4,6 @@ import sys
 
 import mwparserfromhell
 import pywikibot
-from pywikibot import pagegenerators
 
 
 class SubstitutionBot(object):
@@ -16,23 +15,20 @@ class SubstitutionBot(object):
         self.source_template = pywikibot.Page(site, template_name)
 
     def _templates_generator(self):
-        generator = pagegenerators.NamespaceFilterPageGenerator(
-            pagegenerators.ReferringPageGenerator(self.source_template, onlyTemplateInclusion=True),
-            [10]
-        )
+        generator = self.source_template.getReferences(only_template_inclusion=True, namespaces=[10])
         for page in generator:
             template = page
             if template.title().endswith("/doc") and pywikibot.Page(self.site, template.title()[:-4]).exists():
                 template = pywikibot.Page(self.site, template.title()[:-4])
             if template != self.source_template:
                 yield template
-            for redirect in template.getReferences(redirectsOnly=True, withTemplateInclusion=False):
+            for redirect in template.getReferences(filter_redirects=True, with_template_inclusion=False):
                 yield redirect
 
     def run(self):
         for template in self._templates_generator():
-            title = template.title(withNamespace=False).lower()
-            for page in pagegenerators.ReferringPageGenerator(template, onlyTemplateInclusion=True):
+            title = template.title(with_ns=False).lower()
+            for page in template.getReferences(only_template_inclusion=True):
                 try:
                     text = page.get()
                 except pywikibot.Error:
@@ -55,9 +51,9 @@ class SubstitutionBot(object):
                     try:
                         page.put(
                             code,
-                            "Bot: Substituting {{%s}}" % template.title(asLink=True, allowInterwiki=False)
+                            "Bot: Substituting {{%s}}" % template.title(as_link=True, allow_interwiki=False)
                         )
-                    except pywikibot.Error:
+                    except pywikibot.exceptions.Error:
                         continue
 
 
