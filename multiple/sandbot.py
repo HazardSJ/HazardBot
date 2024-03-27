@@ -133,7 +133,7 @@ class SandBot(object):
             "sqwiki": {
                 "site": pywikibot.Site("sq", "wikipedia"),
                 "dotask": None,  # "User:Hazard-Bot/DoTask/SandBot",
-                "edit_summary": "Roboti: Pastrim automatik",
+                "edit_summary": "Pastrim automatik i faqes",
                 "sandbots": ["Hazard-Bot"],
                 "sandboxes": {
                     "Project:Livadhi": "general",
