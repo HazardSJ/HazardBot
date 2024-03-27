@@ -140,11 +140,11 @@ class SandBot(object):
                 },
                 "groups": {
                     "general": """{{Livadhi}}<!--
-*      Mirë se erdhët në Livadhin e Wikipedia-s!   *
-*          Ju lutemi, mos e fshini këtë pjesë.    *
-*        Kjo faqe pastrohet rregullisht.          *
+*    Mirë se erdhët në Livadhin e Wikipedia-s!    *
+*       Ju lutemi, mos e fshini këtë pjesë.       *
+*         Kjo faqe pastrohet rregullisht.         *
 *   Provoni aftësitë tuaja të redaktimit poshtë.  *
-■■■■ ■■■■■ ■■■■■■■■■■■■■■■■■■■■■■■ ■■■■ ■■■■■■■■ ■■■■■ ■■■■■-->
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■-->
 """,
                 },
             },
