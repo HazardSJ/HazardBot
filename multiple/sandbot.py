@@ -279,10 +279,10 @@ def main():
             else:
                 header = False
     if db_name not in sandbot_sites:
-        raise Exception("%s is not configured as a sandbot site.")
+        raise Exception("%s is not configured as a sandbot site." % db_name)
     if header:
         if db_name not in sandbot_header_sites:
-            raise Exception("%s is not configured as a sandbot header site.")
+            raise Exception("%s is not configured as a sandbot header site." % db_name)
         else:
             bot = SandHeaderBot(db_name)
     else:
