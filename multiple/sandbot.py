@@ -254,7 +254,7 @@ class SandHeaderBot(SandBot):
 
 
 def main():
-    sandbot_sites = ["commonswiki", "enwiki", "mediawikiwiki", "nlwiki", "simplewiki"]
+    sandbot_sites = ["commonswiki", "enwiki", "mediawikiwiki", "nlwiki", "simplewiki", "sqwiki"]
     sandbot_header_sites = ["enwiki"]
     header = False
     if len(sys.argv) > 1:
