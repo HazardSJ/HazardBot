@@ -139,13 +139,7 @@ class SandBot(object):
                     "Project:Livadhi": "general",
                 },
                 "groups": {
-                    "general": """{{Livadhi}}<!--
-*    Mirë se erdhët në Livadhin e Wikipedia-s!    *
-*       Ju lutemi, mos e fshini këtë pjesë.       *
-*         Kjo faqe pastrohet rregullisht.         *
-*   Provoni aftësitë tuaja të redaktimit poshtë.  *
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■-->
-""",
+                    "general": "{{subst:Livadhi/pastrim}}",
                 },
             },
         }
